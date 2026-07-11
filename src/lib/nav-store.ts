@@ -5,6 +5,7 @@ import { create } from "zustand";
 export type ViewKey =
   | "overview"
   | "library"
+  | "instructions"
   | "history"
   | "editor"
   | "playground"

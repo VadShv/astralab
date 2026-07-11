@@ -11,15 +11,13 @@ import {
   ScrollText,
   Orbit,
   Search,
-  Sun,
-  Moon,
   Plus,
   ChevronRight,
   Radar,
   Users,
   Activity,
+  BookOpen,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useNav, type ViewKey } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -38,6 +36,7 @@ import { useQuery } from "@tanstack/react-query";
 const NAV: { key: ViewKey; label: string; icon: React.ElementType; group: string; code: string }[] = [
   { key: "overview", label: "Командный центр", icon: LayoutDashboard, group: "Навигация", code: "CMD-01" },
   { key: "library", label: "Библиотека HR-промптов", icon: Library, group: "Навигация", code: "LIB-02" },
+  { key: "instructions", label: "Инструкция", icon: BookOpen, group: "Навигация", code: "DOC-09" },
   { key: "history", label: "Граф версий", icon: GitBranch, group: "Разработка", code: "DAG-03" },
   { key: "editor", label: "Конструктор промптов", icon: Code2, group: "Разработка", code: "EDT-04" },
   { key: "playground", label: "Тестовый стенд", icon: FlaskConical, group: "Разработка", code: "PLG-05" },
@@ -250,9 +249,6 @@ function UserMenu() {
 
 function Topbar({ onMenu }: { onMenu: () => void }) {
   const { view } = useNav();
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
 
   const title = NAV.find((n) => n.key === view)?.label ?? "Командный центр";
   const code = NAV.find((n) => n.key === view)?.code ?? "CMD-01";
@@ -291,20 +287,6 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <Activity className="h-3 w-3 text-primary blink" />
         <span className="font-mono text-[10px] text-primary/70">LIVE</span>
       </div>
-
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 hover:bg-primary/10"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        aria-label="Сменить тему"
-      >
-        {mounted && theme === "dark" ? (
-          <Sun className="h-4 w-4 text-primary" />
-        ) : (
-          <Moon className="h-4 w-4" />
-        )}
-      </Button>
 
       <Button
         size="sm"

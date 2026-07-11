@@ -4,6 +4,7 @@ import * as React from "react";
 import { useNav } from "@/lib/nav-store";
 import { OverviewView } from "@/components/views/overview";
 import { LibraryView } from "@/components/views/library";
+import { InstructionsView } from "@/components/views/instructions";
 import { HistoryView } from "@/components/views/history";
 import { EditorView } from "@/components/views/editor";
 import { PlaygroundView } from "@/components/views/playground";
@@ -18,6 +19,8 @@ export function ViewRouter() {
       return <OverviewView />;
     case "library":
       return <LibraryView />;
+    case "instructions":
+      return <InstructionsView />;
     case "history":
       return <HistoryView />;
     case "editor":
