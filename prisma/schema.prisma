@@ -1,0 +1,216 @@
+// PromptVault — schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  avatarColor String   @default("#10b981")
+  role        String   @default("admin") // viewer | developer | reviewer | admin
+  createdAt   DateTime @default(now())
+
+  versions  PromptVersion[] @relation("VersionAuthor")
+  audits    AuditLog[]      @relation("AuditActor")
+  comments  Comment[]       @relation("CommentAuthor")
+  activated ActiveVersion[] @relation("Activator")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  plan      String   @default("growth") // free | starter | growth | enterprise
+  createdAt DateTime @default(now())
+
+  projects Project[]
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  organizationId String
+  name          String
+  slug          String   @unique
+  description   String
+  createdAt     DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  prompts      Prompt[]
+  audits       AuditLog[]
+}
+
+model Prompt {
+  id            String    @id @default(cuid())
+  projectId     String
+  name          String
+  description   String
+  tags          Json      // string[]
+  defaultModel  String    @default("glm-4.6")
+  createdAt     DateTime  @default(now())
+  archivedAt    DateTime?
+
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions      PromptVersion[]
+  branches      Branch[]
+  tags_rel      Tag[]
+  experiments   Experiment[]
+  activeVersions ActiveVersion[]
+
+  @@unique([projectId, name])
+}
+
+model PromptVersion {
+  id              String   @id @default(cuid())
+  promptId        String
+  versionHash     String   @unique
+  semver          String
+  branch          String   @default("main")
+  content         Json     // { system, user, assistant? turns }
+  variables       Json     // [{ name, type, required, default, description }]
+  modelConfig     Json     // { temperature, top_p, max_tokens, stop }
+  parentVersionId String?
+  commitMessage   String
+  authorId        String
+  status          String   @default("draft") // draft | review | active | deprecated | rejected
+  createdAt       DateTime @default(now())
+
+  prompt          Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  author          User          @relation("VersionAuthor", fields: [authorId], references: [id])
+  parent          PromptVersion? @relation("VersionParent", fields: [parentVersionId], references: [id], onDelete: SetNull)
+  children        PromptVersion[] @relation("VersionParent")
+  tags            Tag[]
+  experimentVars  ExperimentVariant[]
+  comments        Comment[]
+  activeIn        ActiveVersion[]
+
+  @@index([promptId])
+  @@index([branch])
+}
+
+model Branch {
+  id            String   @id @default(cuid())
+  promptId      String
+  name          String
+  headVersionId String?
+  createdAt     DateTime @default(now())
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, name])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  promptId  String
+  name      String
+  versionId String
+  createdAt DateTime @default(now())
+
+  prompt  Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  version PromptVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([promptId, name])
+}
+
+model ActiveVersion {
+  id           String   @id @default(cuid())
+  promptId     String
+  environment  String // development | staging | production
+  versionId    String
+  activatedAt  DateTime @default(now())
+  activatedBy  String?
+
+  prompt    Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  version   PromptVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  activator User?         @relation("Activator", fields: [activatedBy], references: [id])
+
+  @@unique([promptId, environment])
+}
+
+model Experiment {
+  id                String    @id @default(cuid())
+  promptId          String
+  name              String
+  hypothesis        String
+  trafficSplit      Json      // { control: 0.5, variant_a: 0.5 }
+  targetingRules    Json     
+  minSampleSize     Int       @default(1000)
+  confidenceLevel   Float     @default(0.95)
+  primaryMetric     String    @default("eval_pass_rate")
+  guardrailMetrics  Json     
+  status            String    @default("draft") // draft | running | paused | concluded
+  winnerVariantId   String?
+  startedAt         DateTime?
+  endedAt           DateTime?
+  createdAt         DateTime  @default(now())
+
+  prompt   Prompt               @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  variants ExperimentVariant[]
+  events   ExperimentEvent[]
+}
+
+model ExperimentVariant {
+  id            String  @id @default(cuid())
+  experimentId  String
+  name          String // control | variant_a | variant_b
+  versionId     String
+  trafficWeight Float
+
+  experiment Experiment         @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  version    PromptVersion      @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  events     ExperimentEvent[]
+}
+
+model ExperimentEvent {
+  id            String   @id @default(cuid())
+  experimentId  String
+  variantId     String
+  userId        String
+  metricName    String
+  metricValue   Float
+  tokensIn      Int      @default(0)
+  tokensOut     Int      @default(0)
+  costUsd       Float    @default(0)
+  latencyMs     Int      @default(0)
+  evalScore     Float?
+  createdAt     DateTime @default(now())
+
+  experiment Experiment        @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  variant    ExperimentVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@index([experimentId, variantId])
+  @@index([metricName])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  versionId String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  version PromptVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  author  User          @relation("CommentAuthor", fields: [authorId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  projectId  String
+  actorId    String?
+  action     String // version.created | version.activated | rollback.triggered | experiment.concluded ...
+  targetType String
+  targetId   String
+  detail     Json    
+  createdAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actor   User?   @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([projectId])
+}
