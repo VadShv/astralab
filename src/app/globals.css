@@ -43,76 +43,81 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ============================================================
+   ASTRA HR LAB — Космическая дизайн-система
+   Глубокий космос + циан/голубые акценты + glassmorphism
+   ============================================================ */
+
 :root {
-  --radius: 0.7rem;
-  /* Light: warm off-white canvas, emerald primary */
-  --background: oklch(0.985 0.004 150);
-  --foreground: oklch(0.21 0.02 165);
+  --radius: 0.5rem;
+
+  /* Светлая тема — мягкая, но технологичная */
+  --background: oklch(0.99 0.003 230);
+  --foreground: oklch(0.16 0.02 240);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.02 165);
+  --card-foreground: oklch(0.16 0.02 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.02 165);
-  --primary: oklch(0.58 0.13 162);
-  --primary-foreground: oklch(0.99 0.01 150);
-  --secondary: oklch(0.96 0.01 160);
-  --secondary-foreground: oklch(0.3 0.03 165);
-  --muted: oklch(0.96 0.008 160);
-  --muted-foreground: oklch(0.5 0.02 165);
-  --accent: oklch(0.94 0.04 80);
-  --accent-foreground: oklch(0.32 0.06 70);
+  --popover-foreground: oklch(0.16 0.02 240);
+  --primary: oklch(0.55 0.16 220);
+  --primary-foreground: oklch(0.99 0.01 230);
+  --secondary: oklch(0.96 0.01 230);
+  --secondary-foreground: oklch(0.25 0.03 240);
+  --muted: oklch(0.96 0.008 230);
+  --muted-foreground: oklch(0.5 0.02 240);
+  --accent: oklch(0.94 0.03 200);
+  --accent-foreground: oklch(0.3 0.05 200);
   --destructive: oklch(0.58 0.21 25);
-  --border: oklch(0.9 0.01 160);
-  --input: oklch(0.92 0.01 160);
-  --ring: oklch(0.58 0.13 162);
-  /* chart palette: emerald, amber, cyan, violet, rose */
-  --chart-1: oklch(0.62 0.13 162);
-  --chart-2: oklch(0.72 0.15 75);
-  --chart-3: oklch(0.6 0.11 220);
-  --chart-4: oklch(0.58 0.18 305);
+  --border: oklch(0.9 0.01 230);
+  --input: oklch(0.92 0.01 230);
+  --ring: oklch(0.55 0.16 220);
+  --chart-1: oklch(0.6 0.16 200);
+  --chart-2: oklch(0.62 0.15 260);
+  --chart-3: oklch(0.7 0.13 170);
+  --chart-4: oklch(0.65 0.18 305);
   --chart-5: oklch(0.62 0.2 20);
-  --sidebar: oklch(0.99 0.003 150);
-  --sidebar-foreground: oklch(0.21 0.02 165);
-  --sidebar-primary: oklch(0.58 0.13 162);
-  --sidebar-primary-foreground: oklch(0.99 0.01 150);
-  --sidebar-accent: oklch(0.95 0.02 160);
-  --sidebar-accent-foreground: oklch(0.3 0.03 165);
-  --sidebar-border: oklch(0.9 0.01 160);
-  --sidebar-ring: oklch(0.58 0.13 162);
+  --sidebar: oklch(0.985 0.003 230);
+  --sidebar-foreground: oklch(0.16 0.02 240);
+  --sidebar-primary: oklch(0.55 0.16 220);
+  --sidebar-primary-foreground: oklch(0.99 0.01 230);
+  --sidebar-accent: oklch(0.95 0.02 220);
+  --sidebar-accent-foreground: oklch(0.25 0.03 240);
+  --sidebar-border: oklch(0.9 0.01 230);
+  --sidebar-ring: oklch(0.55 0.16 220);
 }
 
 .dark {
-  /* Dark: deep slate-green, vibrant emerald */
-  --background: oklch(0.17 0.012 170);
-  --foreground: oklch(0.96 0.008 150);
-  --card: oklch(0.21 0.014 170);
-  --card-foreground: oklch(0.96 0.008 150);
-  --popover: oklch(0.21 0.014 170);
-  --popover-foreground: oklch(0.96 0.008 150);
-  --primary: oklch(0.72 0.15 162);
-  --primary-foreground: oklch(0.18 0.03 170);
-  --secondary: oklch(0.26 0.015 170);
-  --secondary-foreground: oklch(0.96 0.008 150);
-  --muted: oklch(0.25 0.012 170);
-  --muted-foreground: oklch(0.7 0.015 165);
-  --accent: oklch(0.32 0.05 75);
-  --accent-foreground: oklch(0.95 0.03 75);
+  /* Тёмная тема — глубокий космос Астра */
+  --background: oklch(0.13 0.02 245);
+  --foreground: oklch(0.96 0.01 220);
+  --card: oklch(0.17 0.025 245);
+  --card-foreground: oklch(0.96 0.01 220);
+  --popover: oklch(0.17 0.025 245);
+  --popover-foreground: oklch(0.96 0.01 220);
+  --primary: oklch(0.78 0.14 200);  /* циан */
+  --primary-foreground: oklch(0.14 0.03 245);
+  --secondary: oklch(0.22 0.03 245);
+  --secondary-foreground: oklch(0.96 0.01 220);
+  --muted: oklch(0.21 0.025 245);
+  --muted-foreground: oklch(0.68 0.02 220);
+  --accent: oklch(0.3 0.06 200);
+  --accent-foreground: oklch(0.92 0.04 200);
   --destructive: oklch(0.68 0.2 22);
-  --border: oklch(1 0 0 / 9%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.72 0.15 162);
-  --chart-1: oklch(0.72 0.15 162);
-  --chart-2: oklch(0.78 0.15 75);
-  --chart-3: oklch(0.7 0.12 210);
-  --chart-4: oklch(0.7 0.18 305);
+  --border: oklch(0.3 0.03 240 / 60%);
+  --input: oklch(0.26 0.03 245 / 70%);
+  --ring: oklch(0.78 0.14 200);
+  --chart-1: oklch(0.78 0.14 200);
+  --chart-2: oklch(0.7 0.15 260);
+  --chart-3: oklch(0.75 0.13 170);
+  --chart-4: oklch(0.72 0.18 305);
   --chart-5: oklch(0.72 0.2 20);
-  --sidebar: oklch(0.19 0.013 170);
-  --sidebar-foreground: oklch(0.96 0.008 150);
-  --sidebar-primary: oklch(0.72 0.15 162);
-  --sidebar-primary-foreground: oklch(0.18 0.03 170);
-  --sidebar-accent: oklch(0.26 0.015 170);
-  --sidebar-accent-foreground: oklch(0.96 0.008 150);
-  --sidebar-border: oklch(1 0 0 / 9%);
-  --sidebar-ring: oklch(0.72 0.15 162);
+  --sidebar: oklch(0.15 0.022 248);
+  --sidebar-foreground: oklch(0.96 0.01 220);
+  --sidebar-primary: oklch(0.78 0.14 200);
+  --sidebar-primary-foreground: oklch(0.14 0.03 245);
+  --sidebar-accent: oklch(0.22 0.03 245);
+  --sidebar-accent-foreground: oklch(0.96 0.01 220);
+  --sidebar-border: oklch(0.28 0.03 240 / 50%);
+  --sidebar-ring: oklch(0.78 0.14 200);
 }
 
 @layer base {
@@ -125,75 +130,142 @@
   }
 }
 
-/* Custom scrollbar */
-.scroll-thin::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.scroll-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scroll-thin::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 999px;
-}
-.scroll-thin::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+/* ============================================================
+   Космический фон — звёздное небо + глубокий градиент
+   ============================================================ */
+.bg-cosmos {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at top, color-mix(in oklch, var(--primary) 8%, transparent), transparent 60%),
+    radial-gradient(ellipse at bottom right, color-mix(in oklch, var(--chart-2) 6%, transparent), transparent 50%),
+    radial-gradient(circle at 20% 30%, color-mix(in oklch, var(--primary) 4%, transparent) 0.5px, transparent 1px),
+    radial-gradient(circle at 70% 60%, color-mix(in oklch, var(--foreground) 8%, transparent) 0.5px, transparent 1px),
+    radial-gradient(circle at 40% 80%, color-mix(in oklch, var(--primary) 3%, transparent) 0.5px, transparent 1px),
+    radial-gradient(circle at 85% 15%, color-mix(in oklch, var(--foreground) 6%, transparent) 0.5px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 250px 250px, 180px 180px, 320px 320px, 200px 200px;
 }
 
-/* Grid background pattern */
 .bg-grid {
   background-image:
-    linear-gradient(to right, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--border) 60%, transparent) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(to right, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--primary) 12%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-.bg-dots {
-  background-image: radial-gradient(color-mix(in oklch, var(--muted-foreground) 35%, transparent) 1px, transparent 1px);
-  background-size: 18px 18px;
+.bg-grid-fine {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--primary) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--primary) 6%, transparent) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-/* Glow utility */
-.glow-emerald {
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--primary) 30%, transparent),
-    0 8px 40px -12px color-mix(in oklch, var(--primary) 45%, transparent);
+/* ============================================================
+   Glassmorphism — стеклянные панели
+   ============================================================ */
+.glass {
+  background: color-mix(in oklch, var(--card) 60%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in oklch, var(--primary) 15%, transparent);
 }
 
-/* Diff styling */
-.diff-add {
-  background: color-mix(in oklch, var(--chart-1) 14%, transparent);
-  color: oklch(0.45 0.16 150);
-}
-.dark .diff-add {
-  color: oklch(0.8 0.16 150);
-}
-.diff-del {
-  background: color-mix(in oklch, var(--destructive) 12%, transparent);
-  color: oklch(0.5 0.2 25);
-}
-.dark .diff-del {
-  color: oklch(0.78 0.18 25);
+.glass-strong {
+  background: color-mix(in oklch, var(--card) 80%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid color-mix(in oklch, var(--primary) 20%, transparent);
 }
 
-/* Tag variable highlight in prompt text */
-.var-token {
-  background: color-mix(in oklch, var(--primary) 16%, transparent);
-  color: var(--primary);
-  border-radius: 4px;
-  padding: 0 4px;
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-size: 0.9em;
+/* ============================================================
+   Свечения и неон (Astra-эстетика)
+   ============================================================ */
+.glow-cyan {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--primary) 25%, transparent),
+    0 0 24px -4px color-mix(in oklch, var(--primary) 50%, transparent),
+    0 0 60px -10px color-mix(in oklch, var(--primary) 30%, transparent);
 }
 
+.glow-cyan-sm {
+  box-shadow: 0 0 12px -2px color-mix(in oklch, var(--primary) 45%, transparent);
+}
+
+.text-glow {
+  text-shadow: 0 0 12px color-mix(in oklch, var(--primary) 50%, transparent);
+}
+
+.border-glow {
+  border: 1px solid color-mix(in oklch, var(--primary) 40%, transparent);
+  box-shadow: inset 0 0 16px -8px color-mix(in oklch, var(--primary) 40%, transparent);
+}
+
+/* ============================================================
+   Орбитальные / техно индикаторы
+   ============================================================ */
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklch, var(--primary) 8%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 100% 8px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.corner-brackets {
+  position: relative;
+}
+.corner-brackets::before,
+.corner-brackets::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--primary);
+  border-style: solid;
+  pointer-events: none;
+}
+.corner-brackets::before {
+  top: 6px;
+  left: 6px;
+  border-width: 1px 0 0 1px;
+}
+.corner-brackets::after {
+  bottom: 6px;
+  right: 6px;
+  border-width: 0 1px 1px 0;
+}
+
+/* ============================================================
+   Анимации
+   ============================================================ */
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 50%, transparent); }
-  70% { box-shadow: 0 0 0 8px transparent; }
+  0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 60%, transparent); }
+  70% { box-shadow: 0 0 0 10px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 .pulse-ring {
-  animation: pulse-ring 2s infinite;
+  animation: pulse-ring 2.5s infinite;
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.orbit-spin {
+  animation: orbit 12s linear infinite;
+}
+.orbit-spin-slow {
+  animation: orbit 30s linear infinite;
 }
 
 @keyframes shimmer {
@@ -201,7 +273,96 @@
   100% { background-position: 200% 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--muted-foreground) 18%, transparent), transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--primary) 20%, transparent), transparent);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes scan-sweep {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+.scan-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--primary) 25%, transparent), transparent);
+  animation: scan-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-8px); opacity: 0.6; }
+}
+.float {
+  animation: float-up 4s ease-in-out infinite;
+}
+
+/* ============================================================
+   Скроллбар
+   ============================================================ */
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--primary) 40%, transparent);
+  border-radius: 999px;
+}
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* ============================================================
+   Diff и переменные
+   ============================================================ */
+.diff-add {
+  background: color-mix(in oklch, var(--chart-3) 16%, transparent);
+  color: oklch(0.55 0.16 170);
+}
+.dark .diff-add {
+  color: oklch(0.8 0.14 170);
+}
+.diff-del {
+  background: color-mix(in oklch, var(--destructive) 14%, transparent);
+  color: oklch(0.6 0.2 25);
+}
+.dark .diff-del {
+  color: oklch(0.78 0.18 25);
+}
+
+.var-token {
+  background: color-mix(in oklch, var(--primary) 18%, transparent);
+  color: var(--primary);
+  border-radius: 3px;
+  padding: 0 4px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  border: 1px solid color-mix(in oklch, var(--primary) 30%, transparent);
+}
+
+/* ============================================================
+   Техно-монолейблы
+   ============================================================ */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--primary) 70%, var(--muted-foreground));
 }

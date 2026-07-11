@@ -337,3 +337,26 @@ Stage Summary:
 - KPI за 24ч: ~12000 запросов, $151, 10.7M токенов, 80 промптов в проде.
 - Промпты реально эффективные: playground с реальным LLM вернул детальный структурированный ответ (чек-лист due diligence с таблицами и приоритетами).
 - Браузер-верификация пройдена, функциональность не нарушена.
+
+---
+Task ID: 7
+Agent: Z.ai Code (main)
+Task: Превратить проект в «Astra HR Lab» — ультратехнологичную лабораторию HR-промптов в стиле группы Астра (космическая эстетика).
+
+Work Log:
+- Полностью переписал globals.css: космическая дизайн-система Астра — глубокий космос-фон (bg-cosmos со звёздами), циан/голубые акценты, glassmorphism (.glass/.glass-strong), свечения (.glow-cyan/.text-glow/.border-glow), орбитальные индикаторы (scanline, corner-brackets, orbit-spin), анимации (pulse-ring, orbit, shimmer, scan-sweep, blink, float), техно-монолейблы (.mono-label).
+- Обновил layout.tsx: метаданные Astra HR Lab, html lang="ru".
+- Полностью переписал app-shell.tsx: бренд «ASTRA HR LAB · v2.0 orbit active» с орбитальным логотипом (Orbit icon + вращающееся кольцо), HR-сектор с радаром и индикаторами (ПРОМПТЫ/В ПРОДЕ/A/B), навигация с техно-кодами (CMD-01, LIB-02, DAG-03...), моно-лейблы групп, техно-статус-бар (ORBIT NOMINAL, astra-hr-lab v2.0.0), breadcrumb с кодами, LIVE-индикатор, пользователь «Елена Васкес · HR-админ · L4».
+- Полностью переписал overview.tsx: hero «Космическая лаборатория HR-промптов» с ORBIT-7, орбитальными кольцами, HR-доменами (Скрининг резюме, Интервью, Онбординг, Performance), телеметрия-метрики, стек миссии.
+- Создал src/data/prompts/hr.ts — 24 масштабных HR-промпта (resume-screener, structured-interview, interview-grader, onboarding-30-60-90, job-description, performance-review-sbi, okr-drafter, difficult-conversation, culture-fit, exit-interview, competency-framework, evp-builder, welcome-email, hr-metrics, idp, take-home, salary-benchmarking, grade-description, rejection-feedback, behavioral-script, hr-policy, engagement-survey, succession-planning, candidate-persona). Системные промпты 79-152 слов с методиками (STAR, SBI, 70-20-10, Spencer&Spencer, Grove/Doerr, BEI, 9-box, Gallup) и обязательными оговорками (анти-дискриминация, 152-ФЗ, ТК РФ).
+- Удалил дубликат resume-screener-hr из business.ts (оставил расширенную HR-версию).
+- Обновил seed.ts: организация «Astra HR», проект «HR-орбита Acme AI», HR-промпты загружаются первыми, HR-категория в проде, пользователи с циан-аватарами и @astra-hr.io email.
+- Итог в БД: 143 промпта (24 HR + 119 остальных), 181 версия, 181 ветка, 286 тегов, 217 активных версий, 8 экспериментов, 48000 событий.
+- Проверил в Agent Browser: бренд ASTRA HR LAB, орбитальная навигация с кодами, hero «Космическая лаборатория HR-промптов», HR-домены, библиотека 143 промпта, playground с реальным LLM (вернул масштабный структурированный ответ).
+- 0 ошибок в рантайме, lint чист.
+
+Stage Summary:
+- Ребрендинг в Astra HR Lab завершён: космическая эстетика группы Астра (тёмный космос, циан, glassmorphism, орбитальные элементы, моно-техно-стиль).
+- HR-фокус: 24 специализированных HR-промпта в категории «HR-лаборатория», HR-домены на overview, HR-сектор в сайдбаре.
+- Ультратехнологичный, но понятный сервис: навигация с кодами, телеметрия, орбитальные индикаторы, scanline-эффекты.
+- Браузер-верификация пройдена, функциональность сохранена.

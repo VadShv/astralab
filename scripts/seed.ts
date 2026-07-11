@@ -7,9 +7,11 @@ import { BUSINESS_PROMPTS } from "../src/data/prompts/business";
 import { EDUCATION_PROMPTS } from "../src/data/prompts/education";
 import { CREATIVE_PROMPTS } from "../src/data/prompts/creative";
 import { PROFESSIONAL_PROMPTS } from "../src/data/prompts/professional";
+import { HR_PROMPTS } from "../src/data/prompts/hr";
 import type { SeedPrompt } from "../src/data/prompts/types";
 
 const ALL: SeedPrompt[] = [
+  ...HR_PROMPTS,          // HR-промпты — ПЕРВЫЕ, центральные
   ...MARKETING_PROMPTS,
   ...DEVELOPMENT_PROMPTS,
   ...BUSINESS_PROMPTS,
@@ -37,29 +39,30 @@ async function main() {
 
   console.log("Создание пользователей...");
   const users = await Promise.all([
-    db.user.create({ data: { email: "elena@acme.ai", name: "Елена Васкес", avatarColor: "#10b981", role: "admin" } }),
-    db.user.create({ data: { email: "marcus@acme.ai", name: "Маркус Чен", avatarColor: "#f59e0b", role: "reviewer" } }),
-    db.user.create({ data: { email: "priya@acme.ai", name: "Прия Наир", avatarColor: "#06b6d4", role: "developer" } }),
-    db.user.create({ data: { email: "tom@acme.ai", name: "Том Беккер", avatarColor: "#a855f7", role: "developer" } }),
+    db.user.create({ data: { email: "elena@astra-hr.io", name: "Елена Васкес", avatarColor: "#22d3ee", role: "admin" } }),
+    db.user.create({ data: { email: "marcus@astra-hr.io", name: "Маркус Чен", avatarColor: "#38bdf8", role: "reviewer" } }),
+    db.user.create({ data: { email: "priya@astra-hr.io", name: "Прия Наир", avatarColor: "#818cf8", role: "developer" } }),
+    db.user.create({ data: { email: "tom@astra-hr.io", name: "Том Беккер", avatarColor: "#a5b4fc", role: "developer" } }),
   ]);
   const [elena, marcus, priya, tom] = users;
   const allUsers = [elena, marcus, priya, tom];
 
   console.log("Создание организации и проекта...");
   const org = await db.organization.create({
-    data: { name: "Acme AI", slug: "acme-ai", plan: "growth" },
+    data: { name: "Astra HR", slug: "astra-hr", plan: "growth" },
   });
   const project = await db.project.create({
     data: {
       organizationId: org.id,
-      name: "Платформа ATS",
-      slug: "ats-platform",
-      description: "AI-платформа для управления промптами: версионирование, A/B-тесты, мгновенный откат.",
+      name: "HR-орбита Acme AI",
+      slug: "hr-orbit",
+      description: "Космическая лаборатория HR-промптов: скрининг, интервью, онбординг, performance, развитие.",
     },
   });
 
-  // Категории для распределения по окружениям и авторам
+  // Категории для распределения по окружениям — HR-категория в проде
   const categoryEnv: Record<string, "development" | "staging" | "production"> = {
+    "HR-лаборатория": "production",
     "Маркетинг и контент": "production",
     "Разработка и код": "production",
     "Бизнес и операции": "production",

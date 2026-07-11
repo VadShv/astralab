@@ -22,24 +22,26 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PromptVault — Git для промптов. Релизы с уверенностью.",
+  title: "Astra HR Lab — Космическая лаборатория HR-промптов",
   description:
-    "Платформа версионирования промптов с иммутабельными версиями в стиле Git, статистически корректным A/B-тестированием, оценкой через LLM-as-judge и мгновенным откатом для production-сценариев работы с LLM.",
+    "Ультратехнологичная платформа для создания, версионирования и A/B-тестирования HR-промптов. Скрининг, интервью, онбординг, performance review — на базе иммутабельных версий и статистически корректных экспериментов.",
   keywords: [
+    "HR промпты",
+    "AI в HR",
+    "скрининг резюме",
+    "AI интервью",
     "версионирование промптов",
-    "LLM ops",
-    "A/B тестирование промптов",
-    "управление промптами",
-    "prompt engineering",
-    "оценка LLM",
+    "A/B тестирование",
+    "LLM HR",
+    "рекрутинг AI",
   ],
-  authors: [{ name: "PromptVault" }],
+  authors: [{ name: "Astra HR Lab" }],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
-    title: "PromptVault — Git для промптов",
-    description: "Иммутабельные версии промптов, A/B-тестирование, мгновенный откат.",
+    title: "Astra HR Lab — Космическая лаборатория HR-промптов",
+    description: "Версионирование, A/B-тесты и мгновенный откат для HR-промптов.",
     type: "website",
   },
 };
