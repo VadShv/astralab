@@ -24,16 +24,13 @@ export async function GET() {
       db.project.findUnique({ where: { id: projectId }, include: { organization: true } }),
     ]);
 
-  const events = await db.experimentEvent.aggregate({
-    where: { experiment: { prompt: { projectId } } },
+  const since = new Date(Date.now() - 1000 * 60 * 60 * 24);
+  const events24hAgg = await db.experimentEvent.aggregate({
+    where: { experiment: { prompt: { projectId } }, createdAt: { gte: since } },
     _sum: { costUsd: true, tokensIn: true, tokensOut: true },
     _count: true,
   });
-
-  const since = new Date(Date.now() - 1000 * 60 * 60 * 24);
-  const events24h = await db.experimentEvent.count({
-    where: { experiment: { prompt: { projectId } }, createdAt: { gte: since } },
-  });
+  const events24h = events24hAgg._count;
 
   return NextResponse.json({
     project,
@@ -43,10 +40,10 @@ export async function GET() {
       experiments,
       activeExperiments: activeExperiments.length,
       prodActive: activeVersions,
-      eventsTotal: events._count,
+      eventsTotal: events24hAgg._count,
       events24h,
-      cost24hUsd: Number(events._sum.costUsd?.toFixed(2) ?? 0),
-      tokens24h: (events._sum.tokensIn ?? 0) + (events._sum.tokensOut ?? 0),
+      cost24hUsd: Number(events24hAgg._sum.costUsd?.toFixed(2) ?? 0),
+      tokens24h: (events24hAgg._sum.tokensIn ?? 0) + (events24hAgg._sum.tokensOut ?? 0),
     },
     activeExperiments: activeExperiments.map((e) => ({
       id: e.id,

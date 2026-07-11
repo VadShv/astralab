@@ -300,21 +300,72 @@ function fillSample(
   variables: any[]
 ) {
   const sample: Record<string, string> = { ...inputs };
-  const samples: Record<string, string> = {
-    candidate_name: "Ivan Petrov",
+  // Известные примеры по точному имени переменной
+  const known: Record<string, string> = {
+    candidate_name: "Иван Петров",
     job_title: "ML Engineer",
     resume:
-      "Ivan Petrov — ML Engineer\n5 yrs exp. Built recommendation system scaling to 20M users at Yandex. Led migration to vector search, cut p95 latency 40%. MSc CS, MIPT. Python, PyTorch, Kubernetes.",
-    requirements: '["5+ years ML engineering", "Production recommendation systems", "Vector search / embeddings", "Python, PyTorch"]',
-    message: "Hi, my billing failed after I upgraded to the Growth plan. Can you retry the charge? I need access restored ASAP.",
+      "Иван Петров — ML Engineer\n5 лет опыта. Построил рекомендательную систему на 20М пользователей в Яндексе. Возглавил миграцию на векторный поиск, снизил p95-латентность на 40%. Магистр ВМК МГУ. Python, PyTorch, Kubernetes.",
+    requirements: '["5+ лет ML engineering", "Production рекомендательные системы", "Векторный поиск / embeddings", "Python, PyTorch"]',
+    message: "Здравствуйте! После обновления на тариф Growth списание не прошло. Перезарядите карту, пожалуйста — доступ нужен срочно.",
     diff: "+def get_user(id):\n+    return db.query(f\"SELECT * FROM users WHERE id = {id}\")",
-    prospect_name: "Sarah Lin",
+    prospect_name: "Сара Лин",
     company: "Vercel",
-    context: "Just raised Series C, scaling developer tools",
-    value_prop: "PromptVault cuts LLM regression incidents by 80%",
+    context: "Недавно подняли Series C, масштабируют инструменты для разработчиков",
+    value_prop: "PromptVault снижает инциденты с LLM-регрессиями на 80%",
+    topic: "Как векторный поиск меняет рекомендательные системы в 2026 году",
+    audience: "CTO и ML-инженеры продуктовых команд",
+    language: "Python",
+    file_path: "src/api/users/route.ts",
   };
+  // Эвристики по подстроке имени
+  const heuristics: { match: RegExp; value: string }[] = [
+    { match: /name|имя|назван/i, value: "Иван Петров" },
+    { match: /title|должн|role|роль/i, value: "Senior Product Manager" },
+    { match: /company|компани|brand|бренд/i, value: "Acme AI" },
+    { match: /topic|тема|subject|предмет/i, value: "Как AI трансформирует B2B-продажи в 2026 году" },
+    { match: /audience|аудитори|target|целев/i, value: "CTO и продакт-менеджеры SaaS-стартапов серии A–B" },
+    { match: /description|описан|desc/i, value: "Платформа для версионирования промптов с A/B-тестированием и мгновенным откатом" },
+    { match: /context|контекст|background|фон/i, value: "Компания только что подняла Series B, масштабирует AI-направление, ищет способы ускорить релизы промптов в продакшен" },
+    { match: /requirement|требован|criteria|критери/i, value: '["Опыт 5+ лет", "Управление командой", "Знание Python и SQL", "Английский C1+"]' },
+    { match: /keyword|ключев|tag|тег/i, value: '["AI продажам", "B2B SaaS", "LLM", "автоматизация", "воронка"]' },
+    { match: /diff|диф|код|code/i, value: "+def get_user(id):\n+    return db.query(f\"SELECT * FROM users WHERE id = {id}\")" },
+    { match: /resume|резюме|cv/i, value: "Иван Петров — Senior PM, 7 лет в продуктовой разработке. Запустил 3 продукта с ARR $2M+. Ex-Yandex, ex-Avito. МГУ ВМК." },
+    { match: /message|сообщен|ticket|тикет|письмо/i, value: "Здравствуйте! Не могу зайти в личный кабинет после обновления. Пишет «сессия истекла», перепрошу вход — не помогает. Browser: Chrome 120." },
+    { match: /question|вопрос|query|запрос/i, value: "Какие метрики важнее всего отслеживать при A/B-тестировании промптов в продакшене?" },
+    { match: /industry|индустри|domain|область/i, value: "Финтех / банковские технологии" },
+    { match: /goal|цель|objective|задача/i, value: "Увеличить конверсию из триала в платный план на 15% за квартал" },
+    { match: /tone|тон|style|стиль/i, value: "Профессиональный, дружелюбный, без жаргона" },
+    { match: /budget|бюджет|cost|стоимост|price|цена/i, value: "50000" },
+    { match: /count|количеств|number|номер|limit|лимит/i, value: "10" },
+    { match: /level|уровень|grade|класс/i, value: "Middle" },
+    { match: /language|язык/i, value: "Python" },
+    { match: /format|формат/i, value: "Markdown с заголовками H2/H3 и примерами" },
+  ];
+
   for (const v of variables) {
-    if (samples[v.name]) sample[v.name] = samples[v.name];
+    if (sample[v.name] && sample[v.name].trim()) continue; // не перезаписываем
+    if (known[v.name]) {
+      sample[v.name] = known[v.name];
+      continue;
+    }
+    // эвристика
+    const h = heuristics.find((x) => x.match.test(v.name) || x.match.test(v.description || ""));
+    if (h) {
+      sample[v.name] = h.value;
+      continue;
+    }
+    // fallback по типу
+    if (v.type === "object") {
+      sample[v.name] = '["элемент 1", "элемент 2", "элемент 3"]';
+    } else if (v.type === "number") {
+      sample[v.name] = "10";
+    } else if (v.type === "boolean") {
+      sample[v.name] = "true";
+    } else {
+      // используем описание или имя как подсказку
+      sample[v.name] = v.description ? `Пример: ${v.description}` : `Пример значения для ${v.name}`;
+    }
   }
   setInputs(sample);
   toast.success("Пример заполнен");

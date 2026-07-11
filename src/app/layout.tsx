@@ -22,24 +22,24 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PromptVault — Git for Prompts. Ship with confidence.",
+  title: "PromptVault — Git для промптов. Релизы с уверенностью.",
   description:
-    "Prompt versioning platform with Git-like immutable versions, statistically correct A/B testing, LLM-as-judge evals, and instant rollback for production LLM workflows.",
+    "Платформа версионирования промптов с иммутабельными версиями в стиле Git, статистически корректным A/B-тестированием, оценкой через LLM-as-judge и мгновенным откатом для production-сценариев работы с LLM.",
   keywords: [
-    "prompt versioning",
+    "версионирование промптов",
     "LLM ops",
-    "A/B testing prompts",
-    "prompt management",
+    "A/B тестирование промптов",
+    "управление промптами",
     "prompt engineering",
-    "LLM evaluation",
+    "оценка LLM",
   ],
   authors: [{ name: "PromptVault" }],
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
-    title: "PromptVault — Git for Prompts",
-    description: "Immutable prompt versions, A/B testing, instant rollback.",
+    title: "PromptVault — Git для промптов",
+    description: "Иммутабельные версии промптов, A/B-тестирование, мгновенный откат.",
     type: "website",
   },
 };
