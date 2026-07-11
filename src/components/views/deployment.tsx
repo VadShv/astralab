@@ -29,9 +29,9 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const ENVS = [
-  { id: "development", label: "Development", color: "#06b6d4" },
+  { id: "development", label: "Разработка", color: "#06b6d4" },
   { id: "staging", label: "Staging", color: "#f59e0b" },
-  { id: "production", label: "Production", color: "#10b981" },
+  { id: "production", label: "Продакшн", color: "#10b981" },
 ];
 
 export function DeploymentView() {
@@ -54,7 +54,7 @@ export function DeploymentView() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
-      toast.success("Version promoted");
+      toast.success("Версия продвинута");
     },
   });
 
@@ -68,7 +68,7 @@ export function DeploymentView() {
     onSuccess: (d) => {
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
-      toast.success(`Rolled back to ${d.rolledBackTo?.semver}`);
+      toast.success(`Откат к ${d.rolledBackTo?.semver}`);
     },
   });
 
@@ -78,16 +78,16 @@ export function DeploymentView() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">Deployment Map</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Карта развёртывания</h2>
         <p className="text-sm text-muted-foreground">
-          Active version per environment. Promote across dev → staging → prod, or rollback instantly.
+          Активная версия на каждое окружение. Продвигайтесь dev → staging → prod или откатывайтесь мгновенно.
         </p>
       </div>
 
       <Card className="overflow-hidden">
         {/* header row */}
         <div className="grid border-b bg-muted/30" style={{ gridTemplateColumns: `220px repeat(${ENVS.length}, 1fr) 140px` }}>
-          <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Prompt</div>
+          <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Промпт</div>
           {ENVS.map((e) => (
             <div key={e.id} className="px-4 py-3">
               <div className="flex items-center gap-1.5 text-xs font-semibold">
@@ -96,7 +96,7 @@ export function DeploymentView() {
               </div>
             </div>
           ))}
-          <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Pipeline</div>
+          <div className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Пайплайн</div>
         </div>
 
         {/* rows */}
@@ -155,7 +155,7 @@ function DeploymentRow({
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                 </div>
                 <div className="text-[10px] text-muted-foreground">
-                  by {active.activator ?? "system"} · {timeAgo(active.activatedAt)}
+                  кем: {active.activator ?? "система"} · {timeAgo(active.activatedAt)}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Select
@@ -163,7 +163,7 @@ function DeploymentRow({
                     onValueChange={(v) => onActivate(v, env.id)}
                   >
                     <SelectTrigger className="h-7 flex-1 text-xs">
-                      <span className="text-muted-foreground">promote…</span>
+                      <span className="text-muted-foreground">продвинуть…</span>
                     </SelectTrigger>
                     <SelectContent>
                       {versions.filter((v) => v.id !== active.versionId).slice(0, 8).map((v) => (
@@ -175,21 +175,21 @@ function DeploymentRow({
                   </Select>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="icon" className="h-7 w-7" title="Rollback">
+                      <Button variant="outline" size="icon" className="h-7 w-7" title="Откат">
                         <RotateCcw className="h-3.5 w-3.5" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Rollback {row.promptName} in {env.label}?</AlertDialogTitle>
+                        <AlertDialogTitle>Откатить {row.promptName} в {env.label}?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Instantly revert to the previous version on {env.label}. A webhook event will fire.
+                          Мгновенно вернуться к предыдущей версии в {env.label}. Сработает webhook-событие.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Отмена</AlertDialogCancel>
                         <AlertDialogAction onClick={() => onRollback(env.id)}>
-                          Rollback now
+                          Откатить сейчас
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -201,7 +201,7 @@ function DeploymentRow({
                 <Server className="h-4 w-4 text-muted-foreground/40" />
                 <Select value="" onValueChange={(v) => onActivate(v, env.id)}>
                   <SelectTrigger className="h-7 w-full text-xs">
-                    <span className="text-muted-foreground">deploy…</span>
+                    <span className="text-muted-foreground">задеплоить…</span>
                   </SelectTrigger>
                   <SelectContent>
                     {versions.slice(0, 8).map((v) => (

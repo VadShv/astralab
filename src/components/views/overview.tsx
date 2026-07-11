@@ -39,32 +39,32 @@ export function OverviewView() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-1.5 rounded-full border bg-background/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
               <Sparkles className="h-3 w-3 text-primary" />
-              GitHub + LaunchDarkly for prompts
+              GitHub + LaunchDarkly для промптов
             </div>
             <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-              Ship prompts with the rigor of{" "}
-              <span className="text-primary">version control</span>
+              Релиз промптов со строгостью{" "}
+              <span className="text-primary">контроля версий</span>
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Immutable, content-addressed versions. Statistically correct A/B testing.
-              LLM-as-judge evals. Instant rollback — all hot-reloaded into production.
+              Иммутабельные версии с content-addressed хэшами. Статистически корректное A/B-тестирование.
+              Оценка через LLM-as-judge. Мгновенный откат — всё горячее обновление в проде.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button size="sm" onClick={() => navigate("library")}>
-                Browse prompts <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
+                Смотреть промпты <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
               </Button>
               <Button size="sm" variant="outline" onClick={() => navigate("experiments")}>
-                <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> View experiments
+                <FlaskConical className="mr-1.5 h-3.5 w-3.5" /> Эксперименты
               </Button>
               <Button size="sm" variant="ghost" onClick={() => navigate("playground")}>
-                <Zap className="mr-1.5 h-3.5 w-3.5" /> Open playground
+                <Zap className="mr-1.5 h-3.5 w-3.5" /> Открыть песочницу
               </Button>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-2 lg:gap-3">
-            <HeroStat label="Versions" value={k?.versions} icon={GitCommitHorizontal} />
-            <HeroStat label="Live A/B" value={k?.activeExperiments} icon={FlaskConical} />
-            <HeroStat label="Prod prompts" value={k?.prodActive} icon={ShieldCheck} />
+            <HeroStat label="Версии" value={k?.versions} icon={GitCommitHorizontal} />
+            <HeroStat label="Активные A/B" value={k?.activeExperiments} icon={FlaskConical} />
+            <HeroStat label="Промпты в проде" value={k?.prodActive} icon={ShieldCheck} />
           </div>
         </div>
       </div>
@@ -72,43 +72,43 @@ export function OverviewView() {
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
-          label="Requests / 24h"
+          label="Запросы / 24ч"
           value={isLoading ? "—" : fmtNum(k?.events24h ?? 0)}
           icon={Zap}
           delta={{ value: "12.4%", positive: true }}
-          hint="served via edge SDK"
+          hint="через edge SDK"
         />
         <KpiCard
-          label="LLM cost / 24h"
+          label="Расход на LLM / 24ч"
           value={isLoading ? "—" : fmtUsd(k?.cost24hUsd ?? 0)}
           icon={DollarSign}
           delta={{ value: "3.1%", positive: false }}
-          hint="across all variants"
+          hint="по всем вариантам"
         />
         <KpiCard
-          label="Tokens / 24h"
+          label="Токены / 24ч"
           value={isLoading ? "—" : fmtNum(k?.tokens24h ?? 0)}
           icon={Cpu}
           delta={{ value: "8.7%", positive: true }}
-          hint="input + output"
+          hint="входящие + исходящие"
         />
         <KpiCard
-          label="Active experiments"
+          label="Активные эксперименты"
           value={isLoading ? "—" : k?.activeExperiments}
           icon={TrendingUp}
-          hint="statistically powered"
+          hint="статистически обеспечены"
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Active experiments */}
         <Panel
-          title="Live experiments"
-          description="Running A/B tests on production traffic"
+          title="Текущие эксперименты"
+          description="A/B-тесты на живом prod-трафике"
           className="lg:col-span-2"
           action={
             <Button variant="ghost" size="sm" onClick={() => navigate("experiments")}>
-              View all <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
+              Все <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
             </Button>
           }
           bodyClassName="p-0"
@@ -129,17 +129,17 @@ export function OverviewView() {
                     <StatusBadge status="running" />
                   </div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    {exp.promptName} · {exp.variants} variants · {exp.primaryMetric}
+                    {exp.promptName} · {exp.variants} варианта · {exp.primaryMetric}
                   </div>
                 </div>
                 <div className="text-right text-xs text-muted-foreground">
-                  started {timeAgo(exp.startedAt)}
+                  начат {timeAgo(exp.startedAt)}
                 </div>
               </button>
             ))}
             {!data?.activeExperiments?.length && !isLoading && (
               <div className="px-5 py-10 text-center text-sm text-muted-foreground">
-                No live experiments. Start one from a prompt.
+                Нет активных экспериментов. Запустите из промпта.
               </div>
             )}
           </div>
@@ -147,8 +147,8 @@ export function OverviewView() {
 
         {/* Recent activity */}
         <Panel
-          title="Recent activity"
-          description="Audit timeline"
+          title="Недавняя активность"
+          description="Хронология аудита"
           bodyClassName="p-0"
         >
           <div className="max-h-[320px] overflow-y-auto scroll-thin">
@@ -171,7 +171,7 @@ export function OverviewView() {
                       </span>
                     </div>
                     <div className="mt-0.5 text-xs text-muted-foreground">
-                      {a.actor?.name ?? "system"} · {timeAgo(a.createdAt)}
+                      {a.actor?.name ?? "система"} · {timeAgo(a.createdAt)}
                     </div>
                   </div>
                 </li>
@@ -183,10 +183,10 @@ export function OverviewView() {
 
       {/* Capability strip */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <FeatureChip icon={GitCommitHorizontal} title="Content-addressed" desc="SHA-256 immutable versions" onClick={() => navigate("history")} />
-        <FeatureChip icon={ShieldCheck} title="Guardrail rollback" desc="Auto-revert on breach" onClick={() => navigate("deployment")} />
-        <FeatureChip icon={FlaskConical} title="Sequential testing" desc="Stop early, control α" onClick={() => navigate("experiments")} />
-        <FeatureChip icon={Sparkles} title="LLM-as-judge" desc="Auto eval every response" onClick={() => navigate("playground")} />
+        <FeatureChip icon={GitCommitHorizontal} title="Content-addressed" desc="Иммутабельные версии SHA-256" onClick={() => navigate("history")} />
+        <FeatureChip icon={ShieldCheck} title="Откат по guardrail" desc="Авто-возврат при нарушении" onClick={() => navigate("deployment")} />
+        <FeatureChip icon={FlaskConical} title="Sequential testing" desc="Ранняя остановка, контроль α" onClick={() => navigate("experiments")} />
+        <FeatureChip icon={Sparkles} title="LLM-as-judge" desc="Авто-оценка каждого ответа" onClick={() => navigate("playground")} />
       </div>
     </div>
   );

@@ -36,8 +36,8 @@ export function AuditView() {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">Audit Log</h2>
-        <p className="text-sm text-muted-foreground">Chronological record of who changed what, and when.</p>
+        <h2 className="text-lg font-semibold tracking-tight">Журнал аудита</h2>
+        <p className="text-sm text-muted-foreground">Хронологическая запись: кто, что и когда изменил.</p>
       </div>
 
       {/* filters */}
@@ -60,7 +60,7 @@ export function AuditView() {
       <Card className="overflow-hidden">
         <div className="divide-y">
           {logs.length === 0 && (
-            <div className="py-12 text-center text-sm text-muted-foreground">No matching events.</div>
+            <div className="py-12 text-center text-sm text-muted-foreground">Нет подходящих событий.</div>
           )}
           {logs.map((log) => (
             <div key={log.id} className="flex items-start gap-3 px-4 py-3 hover:bg-muted/30">
@@ -71,7 +71,7 @@ export function AuditView() {
               </Avatar>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
-                  <span className="font-medium">{log.actor?.name ?? "system"}</span>
+                  <span className="font-medium">{log.actor?.name ?? "система"}</span>
                   <span className="font-mono text-[11px] rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
                     {log.action}
                   </span>

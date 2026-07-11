@@ -39,10 +39,10 @@ export function EditorView() {
   if (!promptId) {
     return (
       <div className="space-y-2">
-        <h2 className="text-lg font-semibold">Version Editor</h2>
-        <p className="text-sm text-muted-foreground">Select a prompt from the library first.</p>
+        <h2 className="text-lg font-semibold">Редактор версий</h2>
+        <p className="text-sm text-muted-foreground">Сначала выберите промпт из библиотеки.</p>
         <Button variant="outline" size="sm" onClick={() => navigate("library")}>
-          Open library
+          Открыть библиотеку
         </Button>
       </div>
     );
@@ -98,21 +98,21 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
       }).then((r) => r.json()),
     onSuccess: (data) => {
       if (data.reused) {
-        toast.info("Identical content — reused existing version");
+        toast.info("Идентичное содержимое — использована существующая версия");
       } else {
-        toast.success(`Committed ${data.version?.semver}`);
+        toast.success(`Закоммичено ${data.version?.semver}`);
       }
       qc.invalidateQueries({ queryKey: ["versions", promptId] });
       qc.invalidateQueries({ queryKey: ["overview"] });
       navigate("history", { promptId });
     },
-    onError: (e: any) => toast.error(e.message ?? "Commit failed"),
+    onError: (e: any) => toast.error(e.message ?? "Не удалось закоммитить"),
   });
 
   const fork = () => {
     setReadOnly(false);
     setVersionIdLocal(null);
-    setCommitMessage(`Fork from ${version?.semver}`);
+    setCommitMessage(`Форк от ${version?.semver}`);
   };
   const isReadOnly = readOnly && !!versionId;
 
@@ -136,7 +136,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                   {version.semver} · {shortHash(version.versionHash)} · {version.author?.name} · {timeAgo(version.createdAt)}
                 </>
               ) : (
-                "New version"
+                "Новая версия"
               )}
             </div>
           </div>
@@ -145,10 +145,10 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
           {isReadOnly ? (
             <>
               <Button variant="outline" size="sm" onClick={() => navigate("playground", { promptId, versionId })}>
-                <Play className="mr-1.5 h-4 w-4" /> Test in playground
+                <Play className="mr-1.5 h-4 w-4" /> Тест в песочнице
               </Button>
               <Button size="sm" onClick={fork}>
-                <GitFork className="mr-1.5 h-4 w-4" /> Fork & edit
+                <GitFork className="mr-1.5 h-4 w-4" /> Форкнуть и редактировать
               </Button>
             </>
           ) : (
@@ -167,7 +167,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                 })
               }
             >
-              <GitCommitHorizontal className="mr-1.5 h-4 w-4" /> Commit version
+              <GitCommitHorizontal className="mr-1.5 h-4 w-4" /> Закоммитить версию
             </Button>
           )}
         </div>
@@ -180,19 +180,19 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
           <Card className="p-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Branch</Label>
+                <Label className="text-xs">Ветка</Label>
                 <Select value={branch} onValueChange={setBranch} disabled={isReadOnly}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {branches.map((b: any) => (
                       <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
                     ))}
-                    <SelectItem value="experiment/new">+ new branch…</SelectItem>
+                    <SelectItem value="experiment/new">+ новая ветка…</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Version bump</Label>
+                <Label className="text-xs">Версия (bump)</Label>
                 <Select value={semverKind} onValueChange={(v) => setSemverKind(v as any)} disabled={isReadOnly}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -208,8 +208,8 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
           {/* system */}
           <Card className="p-4">
             <div className="mb-2 flex items-center justify-between">
-              <Label className="flex items-center gap-1.5 text-xs"><Code2 className="h-3.5 w-3.5" /> System message</Label>
-              <span className="text-[11px] text-muted-foreground">{content.system.length} chars</span>
+              <Label className="flex items-center gap-1.5 text-xs"><Code2 className="h-3.5 w-3.5" /> Системное сообщение</Label>
+              <span className="text-[11px] text-muted-foreground">{content.system.length} симв.</span>
             </div>
             <Textarea
               value={content.system}
@@ -217,15 +217,15 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
               rows={7}
               disabled={isReadOnly}
               className="font-mono text-xs"
-              placeholder="You are an expert…"
+              placeholder="Вы эксперт…"
             />
           </Card>
 
           {/* user */}
           <Card className="p-4">
             <div className="mb-2 flex items-center justify-between">
-              <Label className="flex items-center gap-1.5 text-xs"><Code2 className="h-3.5 w-3.5" /> User message template</Label>
-              <span className="text-[11px] text-muted-foreground">{content.user.length} chars</span>
+              <Label className="flex items-center gap-1.5 text-xs"><Code2 className="h-3.5 w-3.5" /> Шаблон пользовательского сообщения</Label>
+              <span className="text-[11px] text-muted-foreground">{content.user.length} симв.</span>
             </div>
             <Textarea
               value={content.user}
@@ -239,12 +239,12 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
 
           {/* commit message */}
           <Card className="p-4">
-            <Label className="mb-2 block text-xs">Commit message</Label>
+            <Label className="mb-2 block text-xs">Сообщение коммита</Label>
             <Input
               value={commitMessage}
               onChange={(e) => setCommitMessage(e.target.value)}
               disabled={isReadOnly}
-              placeholder="Add scoring rubric + concerns field"
+              placeholder="Добавить рубрику оценки + поле замечаний"
             />
           </Card>
         </div>
@@ -253,24 +253,24 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
         <div className="space-y-4">
           <Tabs defaultValue="preview">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="preview" className="text-xs"><Eye className="mr-1 h-3.5 w-3.5" /> Preview</TabsTrigger>
-              <TabsTrigger value="variables" className="text-xs"><Variable className="mr-1 h-3.5 w-3.5" /> Vars</TabsTrigger>
-              <TabsTrigger value="config" className="text-xs"><Sliders className="mr-1 h-3.5 w-3.5" /> Config</TabsTrigger>
+              <TabsTrigger value="preview" className="text-xs"><Eye className="mr-1 h-3.5 w-3.5" /> Превью</TabsTrigger>
+              <TabsTrigger value="variables" className="text-xs"><Variable className="mr-1 h-3.5 w-3.5" /> Переменные</TabsTrigger>
+              <TabsTrigger value="config" className="text-xs"><Sliders className="mr-1 h-3.5 w-3.5" /> Конфиг</TabsTrigger>
               <TabsTrigger value="diff" className="text-xs"><FileDiff className="mr-1 h-3.5 w-3.5" /> Diff</TabsTrigger>
             </TabsList>
 
             <TabsContent value="preview" className="mt-3">
               <Card className="p-4">
-                <div className="mb-2 text-xs font-medium text-muted-foreground">Rendered (variables highlighted)</div>
+                <div className="mb-2 text-xs font-medium text-muted-foreground">Рендер (переменные подсвечены)</div>
                 <div className="space-y-3">
                   <div>
-                    <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">system</div>
+                    <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">система</div>
                     <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-3 font-mono text-[11px] leading-relaxed">
                       {highlightVars(content.system)}
                     </pre>
                   </div>
                   <div>
-                    <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">user</div>
+                    <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">пользователь</div>
                     <pre className="whitespace-pre-wrap rounded-md bg-muted/50 p-3 font-mono text-[11px] leading-relaxed">
                       {highlightVars(content.user)}
                     </pre>
@@ -282,7 +282,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
             <TabsContent value="variables" className="mt-3 space-y-2">
               <Card className="p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-xs font-medium">Declared variables</span>
+                  <span className="text-xs font-medium">Объявленные переменные</span>
                   <Button
                     size="sm"
                     variant="outline"
@@ -292,12 +292,12 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                       setVariables([...variables, { name: "new_var", type: "string", required: false }])
                     }
                   >
-                    <Plus className="mr-1 h-3.5 w-3.5" /> Add
+                    <Plus className="mr-1 h-3.5 w-3.5" /> Добавить
                   </Button>
                 </div>
                 <div className="space-y-2">
                   {variables.length === 0 && (
-                    <div className="py-4 text-center text-xs text-muted-foreground">No variables declared.</div>
+                    <div className="py-4 text-center text-xs text-muted-foreground">Переменные не объявлены.</div>
                   )}
                   {variables.map((v, i) => (
                     <div key={i} className="grid grid-cols-12 items-center gap-2">
@@ -339,7 +339,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                           }}
                           className="h-3.5 w-3.5"
                         />
-                        required
+                        обяз.
                       </label>
                       <Button
                         variant="ghost"
@@ -447,10 +447,10 @@ function DiffPanel({
   if (!versionId || !parentVersionId)
     return (
       <Card className="p-6 text-center text-xs text-muted-foreground">
-        No parent version to diff against.
+        Нет родительской версии для сравнения.
       </Card>
     );
-  if (isLoading) return <Card className="p-6 text-center text-xs text-muted-foreground">Computing diff…</Card>;
+  if (isLoading) return <Card className="p-6 text-center text-xs text-muted-foreground">Вычисление diff…</Card>;
 
   return (
     <Card className="p-0 overflow-hidden">

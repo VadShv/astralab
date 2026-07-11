@@ -37,8 +37,8 @@ export function HistoryView() {
   if (!promptId) {
     return (
       <Picker
-        title="Version History"
-        hint="Select a prompt to visualize its commit DAG."
+        title="История версий"
+        hint="Выберите промпт, чтобы увидеть граф коммитов (DAG)."
       />
     );
   }
@@ -113,10 +113,10 @@ function HistoryInner({ promptId }: { promptId: string }) {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => navigate("playground", { promptId })}>
-            <Code2 className="mr-1.5 h-4 w-4" /> Playground
+            <Code2 className="mr-1.5 h-4 w-4" /> Песочница
           </Button>
           <Button size="sm" onClick={() => navigate("editor", { promptId, versionId: null })}>
-            <Plus className="mr-1.5 h-4 w-4" /> New version
+            <Plus className="mr-1.5 h-4 w-4" /> Новая версия
           </Button>
         </div>
       </div>
@@ -133,7 +133,7 @@ function HistoryInner({ promptId }: { promptId: string }) {
           </div>
         ))}
         <span className="ml-auto text-xs text-muted-foreground">
-          {versions.length} commits · {branches.length} branches
+          {versions.length} коммитов · {branches.length} веток
         </span>
       </div>
 
@@ -141,11 +141,11 @@ function HistoryInner({ promptId }: { promptId: string }) {
       {versions.length === 0 ? (
         <EmptyState
           icon={GitBranch}
-          title="No versions yet"
-          description="Commit your first version to start the history DAG."
+          title="Пока нет версий"
+          description="Создайте первую версию, чтобы начать граф истории."
           action={
             <Button size="sm" onClick={() => navigate("editor", { promptId })}>
-              <Plus className="mr-1.5 h-4 w-4" /> New version
+              <Plus className="mr-1.5 h-4 w-4" /> Новая версия
             </Button>
           }
         />
@@ -297,7 +297,7 @@ function Picker({ title, hint }: { title: string; hint: string }) {
           >
             <div className="font-mono text-sm font-semibold text-primary">{p.name}</div>
             <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.description}</div>
-            <div className="mt-2 text-[11px] text-muted-foreground">{p.versionCount} versions</div>
+            <div className="mt-2 text-[11px] text-muted-foreground">{p.versionCount} версий</div>
           </Card>
         ))}
       </div>

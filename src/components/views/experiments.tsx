@@ -80,11 +80,11 @@ function ExperimentsList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Experiments</h2>
-          <p className="text-sm text-muted-foreground">Statistically powered A/B tests on live traffic</p>
+          <h2 className="text-lg font-semibold tracking-tight">Эксперименты</h2>
+          <p className="text-sm text-muted-foreground">Статистически обеспеченные A/B-тесты на живом трафике</p>
         </div>
         <Button size="sm" onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-1.5 h-4 w-4" /> New experiment
+          <Plus className="mr-1.5 h-4 w-4" /> Новый эксперимент
         </Button>
       </div>
 
@@ -105,7 +105,7 @@ function ExperimentsList() {
 
       {experiments.length === 0 ? (
         <Card className="p-10 text-center text-sm text-muted-foreground">
-          No experiments for this prompt yet.
+          Для этого промпта пока нет экспериментов.
         </Card>
       ) : (
         <div className="grid gap-3">
@@ -124,9 +124,9 @@ function ExperimentsList() {
                   <div className="mt-1 line-clamp-1 text-xs text-muted-foreground">{e.hypothesis}</div>
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                     <span className="font-mono">{e.primaryMetric}</span>
-                    <span>· {(e.trafficSplit as any)?.control * 100}/{(e.trafficSplit as any)?.variant_a * 100} split</span>
-                    <span>· {e.variants?.length} variants</span>
-                    <span>· started {e.startedAt ? timeAgo(e.startedAt) : "—"}</span>
+                    <span>· {(e.trafficSplit as any)?.control * 100}/{(e.trafficSplit as any)?.variant_a * 100} распределение</span>
+                    <span>· {e.variants?.length} варианта(ов)</span>
+                    <span>· начат {e.startedAt ? timeAgo(e.startedAt) : "—"}</span>
                   </div>
                 </div>
                 <FlaskConical className="h-5 w-5 shrink-0 text-muted-foreground" />
@@ -159,7 +159,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
       }).then((r) => r.json()),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["experiment-results", experimentId] });
-      toast.success("Status updated");
+      toast.success("Статус обновлён");
     },
   });
 
@@ -171,7 +171,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
         body: JSON.stringify({}),
       }).then((r) => r.json()),
     onSuccess: (d) => {
-      toast.success(`Promoted ${d.promoted.variant} → ${d.promoted.environment}`);
+      toast.success(`Продвинут ${d.promoted.variant} → ${d.promoted.environment}`);
       qc.invalidateQueries({ queryKey: ["experiment-results", experimentId] });
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
@@ -203,26 +203,26 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
             </div>
             <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{exp.hypothesis}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-              <span className="font-mono">primary: {exp.primaryMetric}</span>
-              <span>· confidence {(exp.confidenceLevel * 100).toFixed(0)}%</span>
-              <span>· {data.totalEvents.toLocaleString()} events</span>
-              <span>· started {exp.startedAt ? timeAgo(exp.startedAt) : "—"}</span>
+              <span className="font-mono">метрика: {exp.primaryMetric}</span>
+              <span>· доверие {(exp.confidenceLevel * 100).toFixed(0)}%</span>
+              <span>· {data.totalEvents.toLocaleString()} событий</span>
+              <span>· начат {exp.startedAt ? timeAgo(exp.startedAt) : "—"}</span>
             </div>
           </div>
         </div>
         <div className="flex gap-2">
           {exp.status === "running" ? (
             <Button variant="outline" size="sm" onClick={() => statusMut.mutate("paused")}>
-              <Pause className="mr-1.5 h-4 w-4" /> Pause
+              <Pause className="mr-1.5 h-4 w-4" /> Пауза
             </Button>
           ) : exp.status === "paused" ? (
             <Button variant="outline" size="sm" onClick={() => statusMut.mutate("running")}>
-              <Play className="mr-1.5 h-4 w-4" /> Resume
+              <Play className="mr-1.5 h-4 w-4" /> Возобновить
             </Button>
           ) : null}
           {data.winner && (
             <Button size="sm" onClick={() => promoteMut.mutate()} disabled={promoteMut.isPending}>
-              <Trophy className="mr-1.5 h-4 w-4" /> Promote winner
+              <Trophy className="mr-1.5 h-4 w-4" /> Продвинуть победителя
             </Button>
           )}
         </div>
@@ -237,7 +237,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
             </div>
             <div className="flex-1">
               <div className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                Winner recommended: {data.winner.name}
+                Рекомендованный победитель: {data.winner.name}
               </div>
               <div className="mt-0.5 text-xs text-muted-foreground">{data.winner.reason}</div>
             </div>
@@ -249,9 +249,9 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
           <div className="flex items-start gap-3">
             <ShieldAlert className="h-5 w-5 shrink-0 text-amber-500" />
             <div className="text-xs">
-              <span className="font-semibold text-amber-700 dark:text-amber-400">Guardrail breached: </span>
+              <span className="font-semibold text-amber-700 dark:text-amber-400">Нарушен guardrail: </span>
               <span className="text-muted-foreground">
-                {data.guardrailStatus.filter((g: any) => g.violated).map((g: any) => `${g.metric} on ${g.violatingVariants.join(", ")}`).join("; ")}. Consider pausing or rolling back.
+                {data.guardrailStatus.filter((g: any) => g.violated).map((g: any) => `${g.metric} on ${g.violatingVariants.join(", ")}`).join("; ")}. Рекомендуется поставить на паузу или откатиться.
               </span>
             </div>
           </div>
@@ -260,23 +260,23 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
 
       {/* Power progress */}
       <Panel
-        title="Sample size & power"
-        description={`MDE 3% · power 80% · confidence ${(exp.confidenceLevel * 100).toFixed(0)}%`}
-        action={<span className="text-xs font-medium">{data.power.collected.toLocaleString()} / {data.power.requiredPerVariant.toLocaleString()} per variant</span>}
+        title="Размер выборки и мощность"
+        description={`MDE 3% · мощность 80% · доверие ${(exp.confidenceLevel * 100).toFixed(0)}%`}
+        action={<span className="text-xs font-medium">{data.power.collected.toLocaleString()} / {data.power.requiredPerVariant.toLocaleString()} на вариант</span>}
       >
         <div className="space-y-2">
           <Progress value={data.power.progressPct} className="h-2" />
           <div className="flex justify-between text-[11px] text-muted-foreground">
-            <span>{data.power.progressPct}% of required sample collected</span>
-            <span>{data.power.progressPct >= 100 ? "✓ powered to detect" : `${100 - data.power.progressPct}% remaining`}</span>
+            <span>{data.power.progressPct}% нужной выборки собрано</span>
+            <span>{data.power.progressPct >= 100 ? "✓ достаточная мощность" : `осталось ${100 - data.power.progressPct}%`}</span>
           </div>
         </div>
       </Panel>
 
       {/* Cumulative chart */}
       <Panel
-        title={`Cumulative ${exp.primaryMetric.replace(/_/g, " ")}`}
-        description="Running mean per variant over time"
+        title={`Накопительный ${exp.primaryMetric.replace(/_/g, " ")}`}
+        description="Скользящее среднее по вариантам во времени"
       >
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -308,15 +308,15 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Comparison table */}
-        <Panel title="Statistical comparison" description={`${data.comparisons[0]?.testType ?? "—"}`} bodyClassName="p-0">
+        <Panel title="Статистическое сравнение" description={`${data.comparisons[0]?.testType ?? "—"}`} bodyClassName="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b bg-muted/30 text-[11px] uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium">Variant</th>
-                  <th className="px-3 py-2 text-right font-medium">Rate</th>
-                  <th className="px-3 py-2 text-right font-medium">Uplift</th>
-                  <th className="px-3 py-2 text-right font-medium">95% CI</th>
+                  <th className="px-4 py-2 text-left font-medium">Вариант</th>
+                  <th className="px-3 py-2 text-right font-medium">Доля</th>
+                  <th className="px-3 py-2 text-right font-medium">Прирост</th>
+                  <th className="px-3 py-2 text-right font-medium">95% ДИ</th>
                   <th className="px-3 py-2 text-right font-medium">p-value</th>
                 </tr>
               </thead>
@@ -324,7 +324,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
                 <tr>
                   <td className="px-4 py-2.5 font-medium">{control.name}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums">{fmtPct(control.primary.rate ?? control.primary.mean)}</td>
-                  <td className="px-3 py-2.5 text-right text-muted-foreground">baseline</td>
+                  <td className="px-3 py-2.5 text-right text-muted-foreground">базовая</td>
                   <td className="px-3 py-2.5 text-right text-muted-foreground">—</td>
                   <td className="px-3 py-2.5 text-right text-muted-foreground">—</td>
                 </tr>
@@ -350,7 +350,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
         </Panel>
 
         {/* Variant metrics grid */}
-        <Panel title="Variant metrics" description="Mean · p95 · cost across all measured signals" bodyClassName="p-0">
+        <Panel title="Метрики вариантов" description="Среднее · p95 · стоимость по всем сигналам" bodyClassName="p-0">
           <div className="divide-y">
             {data.variants.map((v: any, i: number) => (
               <div key={v.variantId} className="flex items-center gap-3 px-4 py-3">
@@ -358,9 +358,9 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
                 <div className="w-20 font-medium text-sm">{v.name}</div>
                 <div className="flex flex-1 flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <Metric label="n" value={fmtNum(v.n)} />
-                  <Metric label="rate" value={fmtPct(v.primary.rate ?? v.primary.mean, 1)} mono />
+                  <Metric label="доля" value={fmtPct(v.primary.rate ?? v.primary.mean, 1)} mono />
                   <Metric label="p95" value={`${v.latency.p95}ms`} mono />
-                  <Metric label="cost" value={fmtUsd(v.cost.mean)} mono />
+                  <Metric label="стоим." value={fmtUsd(v.cost.mean)} mono />
                   <Metric label="tok" value={fmtNum(v.tokens.total)} mono />
                 </div>
               </div>
@@ -371,7 +371,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Guardrails */}
-        <Panel title="Guardrail metrics" description="Auto-pause triggers">
+        <Panel title="Guardrail-метрики" description="Триггеры авто-паузы">
           <div className="space-y-3">
             {data.guardrailStatus.map((g: any) => (
               <div key={g.metric} className="flex items-center justify-between">
@@ -387,7 +387,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
                     </span>
                   ))}
                   <Badge variant={g.violated ? "destructive" : "secondary"} className="text-[10px]">
-                    {g.violated ? "breached" : "ok"}
+                    {g.violated ? "нарушено" : "ок"}
                   </Badge>
                 </div>
               </div>
@@ -396,7 +396,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
         </Panel>
 
         {/* Sequential test */}
-        <Panel title="Sequential testing (mSPRT)" description="Always-valid p-value for early stopping">
+        <Panel title="Sequential testing (mSPRT)" description="Always-valid p-value для ранней остановки">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Always-valid p-value</span>
@@ -406,7 +406,7 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
             </div>
             {data.sequential.stoppedVariant && (
               <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-xs text-emerald-700 dark:text-emerald-400">
-                ✓ Safe to stop — evidence favors <span className="font-semibold">{data.sequential.stoppedVariant}</span>
+                ✓ Можно останавливать — данные в пользу <span className="font-semibold">{data.sequential.stoppedVariant}</span>
               </div>
             )}
             <div className="space-y-2">
@@ -473,30 +473,30 @@ function CreateExperimentDialog({
         body: JSON.stringify(body),
       }).then((r) => r.json()),
     onSuccess: () => {
-      toast.success("Experiment created (draft). Start it from the list.)");
+      toast.success("Эксперимент создан (черновик). Запустите из списка.");
       qc.invalidateQueries({ queryKey: ["prompt-experiments", promptId] });
       onOpenChange(false);
       setName(""); setHypothesis("");
     },
-    onError: (e: any) => toast.error(e.message ?? "Failed"),
+    onError: (e: any) => toast.error(e.message ?? "Не удалось"),
   });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader><DialogTitle>New experiment</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>Новый эксперимент</DialogTitle></DialogHeader>
         <div className="space-y-3 py-1">
           <div className="space-y-1.5">
-            <Label className="text-xs">Name</Label>
+            <Label className="text-xs">Название</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Tone v2 vs Control" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Hypothesis</Label>
-            <Textarea rows={2} value={hypothesis} onChange={(e) => setHypothesis(e.target.value)} placeholder="Variant will lift eval pass rate by ≥3pp" />
+            <Label className="text-xs">Гипотеза</Label>
+            <Textarea rows={2} value={hypothesis} onChange={(e) => setHypothesis(e.target.value)} placeholder="Вариант поднимет eval pass rate на ≥3п.п." />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs">Control version</Label>
+              <Label className="text-xs">Контрольная версия</Label>
               <Select value={controlV} onValueChange={setControlV}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -505,7 +505,7 @@ function CreateExperimentDialog({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Challenger version</Label>
+              <Label className="text-xs">Версия-претендент</Label>
               <Select value={variantV} onValueChange={setVariantV}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -515,7 +515,7 @@ function CreateExperimentDialog({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Primary metric</Label>
+            <Label className="text-xs">Основная метрика</Label>
             <Select value={primary} onValueChange={setPrimary}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -528,7 +528,7 @@ function CreateExperimentDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Отмена</Button>
           <Button
             disabled={!name || !controlV || !variantV || controlV === variantV}
             onClick={() =>
@@ -545,7 +545,7 @@ function CreateExperimentDialog({
               })
             }
           >
-            Create
+            Создать
           </Button>
         </DialogFooter>
       </DialogContent>

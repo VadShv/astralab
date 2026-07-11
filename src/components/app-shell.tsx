@@ -33,14 +33,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 const NAV: { key: ViewKey; label: string; icon: React.ElementType; group: string }[] = [
-  { key: "overview", label: "Overview", icon: LayoutDashboard, group: "Workspace" },
-  { key: "library", label: "Prompt Library", icon: Library, group: "Workspace" },
-  { key: "history", label: "Version History", icon: GitBranch, group: "Develop" },
-  { key: "editor", label: "Version Editor", icon: Code2, group: "Develop" },
-  { key: "playground", label: "Playground", icon: FlaskConical, group: "Develop" },
-  { key: "experiments", label: "Experiments", icon: FlaskConical, group: "Test" },
-  { key: "deployment", label: "Deployment Map", icon: Rocket, group: "Ship" },
-  { key: "audit", label: "Audit Log", icon: ScrollText, group: "Ship" },
+  { key: "overview", label: "Обзор", icon: LayoutDashboard, group: "Рабочее пространство" },
+  { key: "library", label: "Библиотека промптов", icon: Library, group: "Рабочее пространство" },
+  { key: "history", label: "История версий", icon: GitBranch, group: "Разработка" },
+  { key: "editor", label: "Редактор версий", icon: Code2, group: "Разработка" },
+  { key: "playground", label: "Песочница", icon: FlaskConical, group: "Разработка" },
+  { key: "experiments", label: "Эксперименты", icon: FlaskConical, group: "Тестирование" },
+  { key: "deployment", label: "Карта развёртывания", icon: Rocket, group: "Релиз" },
+  { key: "audit", label: "Журнал аудита", icon: ScrollText, group: "Релиз" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -98,7 +98,7 @@ function Sidebar({
           </div>
           <div className="leading-tight">
             <div className="font-semibold tracking-tight">PromptVault</div>
-            <div className="text-[11px] text-muted-foreground">Git for Prompts</div>
+            <div className="text-[11px] text-muted-foreground">Git для промптов</div>
           </div>
         </div>
 
@@ -166,14 +166,14 @@ function ProjectSwitcher() {
               {project?.organization?.name ?? "Acme AI"}
             </div>
             <div className="truncate text-[11px] text-muted-foreground">
-              {project?.name ?? "ATS Platform"}
+              {project?.name ?? "Платформа ATS"}
             </div>
           </div>
         </div>
         <div className="mt-2 flex items-center gap-1.5">
           <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 pulse-ring" />
           <span className="text-[11px] text-muted-foreground">
-            {project?.organization?.plan ?? "growth"} plan · eu region
+            тариф {project?.organization?.plan ?? "growth"} · регион eu
           </span>
         </div>
       </div>
@@ -193,19 +193,19 @@ function UserMenu() {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1 text-left leading-tight">
-              <div className="truncate text-sm font-medium">Elena Vasquez</div>
-              <div className="truncate text-[11px] text-muted-foreground">admin</div>
+              <div className="truncate text-sm font-medium">Елена Васкес</div>
+              <div className="truncate text-[11px] text-muted-foreground">админ</div>
             </div>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top" className="w-52">
           <DropdownMenuLabel>elena@acme.ai</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>API Keys</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>Профиль</DropdownMenuItem>
+          <DropdownMenuItem>API-ключи</DropdownMenuItem>
+          <DropdownMenuItem>Настройки</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-rose-500">Sign out</DropdownMenuItem>
+          <DropdownMenuItem className="text-rose-500">Выйти</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -218,14 +218,14 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
-  const title = NAV.find((n) => n.key === view)?.label ?? "Overview";
+  const title = NAV.find((n) => n.key === view)?.label ?? "Обзор";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-md sm:px-6">
       <button
         onClick={onMenu}
         className="rounded-md p-2 hover:bg-muted lg:hidden"
-        aria-label="Open menu"
+        aria-label="Открыть меню"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <line x1="3" y1="6" x2="21" y2="6" />
@@ -234,7 +234,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         </svg>
       </button>
       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-        <span>ATS Platform</span>
+        <span>Платформа ATS</span>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="font-medium text-foreground">{title}</span>
       </div>
@@ -242,7 +242,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
       <div className="relative ml-auto hidden md:block">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search prompts, versions, experiments…"
+          placeholder="Поиск промптов, версий, экспериментов…"
           className="h-9 w-[280px] pl-9 bg-muted/50"
         />
       </div>
@@ -252,7 +252,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         size="icon"
         className="h-9 w-9"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        aria-label="Toggle theme"
+        aria-label="Сменить тему"
       >
         {mounted && theme === "dark" ? (
           <Sun className="h-4 w-4" />
@@ -263,7 +263,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
 
       <Button size="sm" className="h-9 gap-1.5" onClick={() => useNav.getState().navigate("library")}>
         <Plus className="h-4 w-4" />
-        <span className="hidden sm:inline">New Prompt</span>
+        <span className="hidden sm:inline">Новый промпт</span>
       </Button>
     </header>
   );
@@ -281,17 +281,17 @@ function StatusBar() {
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          All systems operational
+          Все системы работают
         </span>
-        <span>Serving P99 &lt; 200ms</span>
+        <span>Serving P99 &lt; 200 мс</span>
         {k && (
           <>
-            <span>{k.events24h?.toLocaleString()} requests / 24h</span>
-            <span>prod active: {k.prodActive}</span>
-            <span className="hidden sm:inline">experiments running: {k.activeExperiments}</span>
+            <span>{k.events24h?.toLocaleString()} запросов / 24ч</span>
+            <span>в проде активно: {k.prodActive}</span>
+            <span className="hidden sm:inline">экспериментов запущено: {k.activeExperiments}</span>
           </>
         )}
-        <span className="ml-auto font-mono">promptvault v1.0.0 · build 2026.07.11</span>
+        <span className="ml-auto font-mono">promptvault v1.0.0 · сборка 2026.07.11</span>
       </div>
     </footer>
   );

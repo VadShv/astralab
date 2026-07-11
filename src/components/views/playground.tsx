@@ -123,21 +123,21 @@ export function PlaygroundView() {
   };
 
   if (!prompts.length) {
-    return <div className="text-sm text-muted-foreground">Loading playground…</div>;
+    return <div className="text-sm text-muted-foreground">Загрузка песочницы…</div>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Playground</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Песочница</h2>
           <p className="text-sm text-muted-foreground">
-            Test versions with live LLM calls. Compare side-by-side. Runs are not counted in production metrics.
+            Тестируйте версии с реальными вызовами LLM. Сравнивайте бок о бок. Запросы не учитываются в prod-метриках.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={selectedPromptId ?? undefined} onValueChange={(v) => { setSelectedPromptId(v); setColumns([]); setResults({}); setEvals({}); }}>
-            <SelectTrigger className="w-[200px]"><SelectValue placeholder="Select prompt" /></SelectTrigger>
+            <SelectTrigger className="w-[200px]"><SelectValue placeholder="Выберите промпт" /></SelectTrigger>
             <SelectContent>
               {prompts.map((p: any) => (
                 <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
@@ -145,7 +145,7 @@ export function PlaygroundView() {
             </SelectContent>
           </Select>
           <Button size="sm" onClick={runAll} disabled={activeVersions.length === 0}>
-            <Play className="mr-1.5 h-4 w-4" /> Run all
+            <Play className="mr-1.5 h-4 w-4" /> Запустить все
           </Button>
         </div>
       </div>
@@ -154,12 +154,12 @@ export function PlaygroundView() {
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <Label className="flex items-center gap-1.5 text-xs">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Variables
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Переменные
           </Label>
-          <span className="text-[11px] text-muted-foreground">{variables.length} declared</span>
+          <span className="text-[11px] text-muted-foreground">объявлено: {variables.length}</span>
         </div>
         {variables.length === 0 ? (
-          <p className="text-xs text-muted-foreground">This version has no declared variables.</p>
+          <p className="text-xs text-muted-foreground">У этой версии нет объявленных переменных.</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {variables.map((v: any) => (
@@ -190,7 +190,7 @@ export function PlaygroundView() {
             {/* quick fill */}
             <div className="sm:col-span-2 flex flex-wrap gap-2 pt-1">
               <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => fillSample(inputs, setInputs, variables)}>
-                Fill sample data
+                Заполнить примером
               </Button>
             </div>
           </div>
@@ -199,7 +199,7 @@ export function PlaygroundView() {
 
       {/* Compare columns selector */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-muted-foreground">Comparing:</span>
+        <span className="text-xs text-muted-foreground">Сравнение:</span>
         {columns.map((c) => {
           const v = versions.find((x: any) => x.id === c);
           return (
@@ -218,7 +218,7 @@ export function PlaygroundView() {
           value=""
           onValueChange={(v) => { if (!columns.includes(v)) { setColumns([...columns, v]); } }}
         >
-          <SelectTrigger className="h-7 w-[140px] text-xs"><Plus className="mr-1 h-3 w-3" /> add version</SelectTrigger>
+          <SelectTrigger className="h-7 w-[140px] text-xs"><Plus className="mr-1 h-3 w-3" /> добавить версию</SelectTrigger>
           <SelectContent>
             {versions.filter((v: any) => !columns.includes(v.id)).map((v: any) => (
               <SelectItem key={v.id} value={v.id}>{v.semver} · {v.branch}</SelectItem>
@@ -243,7 +243,7 @@ export function PlaygroundView() {
                 </div>
                 <Button size="sm" variant="outline" className="h-7" onClick={() => run(v.id)} disabled={isRunning}>
                   {isRunning ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : <Play className="mr-1 h-3.5 w-3.5" />}
-                  Run
+                  Выполнить
                 </Button>
               </div>
 
@@ -258,7 +258,7 @@ export function PlaygroundView() {
                   </pre>
                 ) : (
                   <div className="flex min-h-[180px] items-center justify-center rounded-md border border-dashed text-xs text-muted-foreground">
-                    {isRunning ? "Calling LLM…" : "Run to see output"}
+                    {isRunning ? "Вызов LLM…" : "Запустите, чтобы увидеть вывод"}
                   </div>
                 )}
               </div>
@@ -317,5 +317,5 @@ function fillSample(
     if (samples[v.name]) sample[v.name] = samples[v.name];
   }
   setInputs(sample);
-  toast.success("Sample data filled");
+  toast.success("Пример заполнен");
 }

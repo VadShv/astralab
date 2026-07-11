@@ -53,9 +53,9 @@ export function LibraryView() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Prompt Library</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Библиотека промптов</h2>
           <p className="text-sm text-muted-foreground">
-            {prompts.length} prompts · immutable, content-addressed versions
+            {prompts.length} промптов · иммутабельные версии с content-addressed хэшами
           </p>
         </div>
         <CreatePromptDialog open={open} onOpenChange={setOpen} />
@@ -66,7 +66,7 @@ export function LibraryView() {
         <div className="relative flex-1 min-w-[220px]">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by name…"
+            placeholder="Поиск по имени…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="pl-9"
@@ -80,7 +80,7 @@ export function LibraryView() {
               !tag ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
             )}
           >
-            all
+            все
           </button>
           {tags.map((t: string) => (
             <button
@@ -108,9 +108,9 @@ export function LibraryView() {
       ) : prompts.length === 0 ? (
         <EmptyState
           icon={Library}
-          title="No prompts yet"
-          description="Create your first prompt to start versioning, testing, and shipping with confidence."
-          action={<CreatePromptDialog open={open} onOpenChange={setOpen} trigger={<Button><Plus className="mr-1.5 h-4 w-4" /> New prompt</Button>} />}
+          title="Пока нет промптов"
+          description="Создайте первый промпт, чтобы начать версионирование, тестирование и релизы с уверенностью."
+          action={<CreatePromptDialog open={open} onOpenChange={setOpen} trigger={<Button><Plus className="mr-1.5 h-4 w-4" /> Новый промпт</Button>} />}
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -154,14 +154,14 @@ function PromptCard({ prompt, onOpen }: { prompt: any; onOpen: () => void }) {
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 border-t pt-3 text-center">
-        <Stat icon={GitBranch} value={prompt.versionCount} label="versions" />
-        <Stat icon={FlaskConical} value={prompt.experimentCount} label="tests" />
-        <Stat icon={Rocket} value={envs.length} label="envs" />
+        <Stat icon={GitBranch} value={prompt.versionCount} label="версий" />
+        <Stat icon={FlaskConical} value={prompt.experimentCount} label="тестов" />
+        <Stat icon={Rocket} value={envs.length} label="окруж." />
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>{prompt.defaultModel}</span>
-        <span>updated {timeAgo(prompt.createdAt)}</span>
+        <span>обновлён {timeAgo(prompt.createdAt)}</span>
       </div>
     </Card>
   );
@@ -202,13 +202,13 @@ function CreatePromptDialog({
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["prompts"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
-      toast.success("Prompt created");
+      toast.success("Промпт создан");
       setName("");
       setDescription("");
       setTagsStr("");
       onOpenChange(false);
     },
-    onError: (e: any) => toast.error(e.message ?? "Failed to create"),
+    onError: (e: any) => toast.error(e.message ?? "Не удалось создать"),
   });
 
   return (
@@ -216,11 +216,11 @@ function CreatePromptDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create prompt</DialogTitle>
+          <DialogTitle>Создать промпт</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="pn">Name</Label>
+            <Label htmlFor="pn">Имя</Label>
             <Input
               id="pn"
               placeholder="resume-screener"
@@ -228,13 +228,13 @@ function CreatePromptDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <p className="text-[11px] text-muted-foreground">Unique within the project. Use kebab-case.</p>
+            <p className="text-[11px] text-muted-foreground">Уникально в рамках проекта. Используйте kebab-case.</p>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="pd">Description</Label>
+            <Label htmlFor="pd">Описание</Label>
             <Textarea
               id="pd"
-              placeholder="What does this prompt do?"
+              placeholder="Что делает этот промпт?"
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -242,7 +242,7 @@ function CreatePromptDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="pt">Tags</Label>
+              <Label htmlFor="pt">Теги</Label>
               <Input
                 id="pt"
                 placeholder="ats, screening"
@@ -251,14 +251,14 @@ function CreatePromptDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="pm">Default model</Label>
+              <Label htmlFor="pm">Модель по умолчанию</Label>
               <Input id="pm" value={model} onChange={(e) => setModel(e.target.value)} />
             </div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Отмена
           </Button>
           <Button
             disabled={!name}
@@ -271,7 +271,7 @@ function CreatePromptDialog({
               })
             }
           >
-            Create
+            Создать
           </Button>
         </DialogFooter>
       </DialogContent>
