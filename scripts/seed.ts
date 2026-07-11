@@ -1,24 +1,10 @@
 import { db } from "../src/lib/db";
 import { computeVersionHash } from "../src/lib/prompt";
 import type { ModelConfig, PromptContent, PromptVariable } from "../src/lib/prompt";
-import { MARKETING_PROMPTS } from "../src/data/prompts/marketing";
-import { DEVELOPMENT_PROMPTS } from "../src/data/prompts/development";
-import { BUSINESS_PROMPTS } from "../src/data/prompts/business";
-import { EDUCATION_PROMPTS } from "../src/data/prompts/education";
-import { CREATIVE_PROMPTS } from "../src/data/prompts/creative";
-import { PROFESSIONAL_PROMPTS } from "../src/data/prompts/professional";
-import { HR_PROMPTS } from "../src/data/prompts/hr";
+import { RECRUITING_PROMPTS } from "../src/data/prompts/recruiting";
 import type { SeedPrompt } from "../src/data/prompts/types";
 
-const ALL: SeedPrompt[] = [
-  ...HR_PROMPTS,          // HR-промпты — ПЕРВЫЕ, центральные
-  ...MARKETING_PROMPTS,
-  ...DEVELOPMENT_PROMPTS,
-  ...BUSINESS_PROMPTS,
-  ...EDUCATION_PROMPTS,
-  ...CREATIVE_PROMPTS,
-  ...PROFESSIONAL_PROMPTS,
-];
+const ALL: SeedPrompt[] = [...RECRUITING_PROMPTS];
 
 async function main() {
   console.log(`Загрузка ${ALL.length} промптов...`);
@@ -39,36 +25,30 @@ async function main() {
 
   console.log("Создание пользователей...");
   const users = await Promise.all([
-    db.user.create({ data: { email: "elena@astra-hr.io", name: "Елена Васкес", avatarColor: "#22d3ee", role: "admin" } }),
-    db.user.create({ data: { email: "marcus@astra-hr.io", name: "Маркус Чен", avatarColor: "#38bdf8", role: "reviewer" } }),
-    db.user.create({ data: { email: "priya@astra-hr.io", name: "Прия Наир", avatarColor: "#818cf8", role: "developer" } }),
-    db.user.create({ data: { email: "tom@astra-hr.io", name: "Том Беккер", avatarColor: "#a5b4fc", role: "developer" } }),
+    db.user.create({ data: { email: "elena@astra-rec.io", name: "Елена Васкес", avatarColor: "#22d3ee", role: "admin" } }),
+    db.user.create({ data: { email: "marcus@astra-rec.io", name: "Маркус Чен", avatarColor: "#38bdf8", role: "reviewer" } }),
+    db.user.create({ data: { email: "priya@astra-rec.io", name: "Прия Наир", avatarColor: "#818cf8", role: "developer" } }),
+    db.user.create({ data: { email: "tom@astra-rec.io", name: "Том Беккер", avatarColor: "#a5b4fc", role: "developer" } }),
   ]);
   const [elena, marcus, priya, tom] = users;
   const allUsers = [elena, marcus, priya, tom];
 
   console.log("Создание организации и проекта...");
   const org = await db.organization.create({
-    data: { name: "Astra HR", slug: "astra-hr", plan: "growth" },
+    data: { name: "Astra Recruiting", slug: "astra-recruiting", plan: "growth" },
   });
   const project = await db.project.create({
     data: {
       organizationId: org.id,
-      name: "HR-орбита Acme AI",
-      slug: "hr-orbit",
-      description: "Космическая лаборатория HR-промптов: скрининг, интервью, онбординг, performance, развитие.",
+      name: "Рекрутинговая лаборатория",
+      slug: "recruiting-lab",
+      description: "Космическая лаборатория промптов для рекрутеров: скрининг, интервью, офферы, аналитика найма.",
     },
   });
 
-  // Категории для распределения по окружениям — HR-категория в проде
+  // Все рекрутинговые промпты — в production
   const categoryEnv: Record<string, "development" | "staging" | "production"> = {
-    "HR-лаборатория": "production",
-    "Маркетинг и контент": "production",
-    "Разработка и код": "production",
-    "Бизнес и операции": "production",
-    "Образование и наука": "staging",
-    "Креатив и медиа": "production",
-    "Профессиональные услуги": "staging",
+    "Рекрутинг": "production",
   };
 
   const auditEntries: any[] = [];

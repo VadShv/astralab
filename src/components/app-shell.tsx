@@ -93,7 +93,7 @@ function Sidebar({
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Бренд Astra HR Lab */}
+        {/* Бренд Astra Recruiting */}
         <div className="relative flex h-16 items-center gap-2.5 border-b border-primary/15 px-5">
           <div className="relative flex h-9 w-9 items-center justify-center">
             <div className="absolute inset-0 rounded-lg bg-primary/15 blur-md" />
@@ -107,10 +107,10 @@ function Sidebar({
           </div>
           <div className="leading-tight">
             <div className="font-semibold tracking-tight text-glow">
-              ASTRA <span className="text-primary">HR</span> LAB
+              ASTRA <span className="text-primary">RECRUITING</span>
             </div>
             <div className="font-mono text-[10px] uppercase tracking-wider text-primary/60">
-              v2.0 · orbit active
+              v3.0 · recruiting lab
             </div>
           </div>
         </div>
@@ -172,7 +172,7 @@ function HrMissionControl() {
   return (
     <div className="border-b border-primary/15 px-3 py-3">
       <div className="mono-label px-1 pb-2 flex items-center gap-1.5">
-        <Radar className="h-3 w-3" /> HR-сектор
+        <Radar className="h-3 w-3" /> Рекрутинг-сектор
       </div>
       <div className="glass rounded-lg px-3 py-2.5 space-y-2">
         <div className="flex items-center justify-between">
@@ -182,15 +182,15 @@ function HrMissionControl() {
             </div>
             <div className="leading-tight">
               <div className="truncate text-xs font-medium">
-                {project?.organization?.name ?? "Astra HR"}
+                {project?.organization?.name ?? "Astra Recruiting"}
               </div>
               <div className="font-mono text-[10px] text-muted-foreground">
-                {project?.name ?? "HR-орбита"}
+                {project?.name ?? "Рекрутинговая лаборатория"}
               </div>
             </div>
           </div>
         </div>
-        {/* HR-метрики-индикаторы */}
+        {/* Метрики-индикаторы */}
         <div className="grid grid-cols-3 gap-1.5 pt-1">
           <Indicator label="ПРОМПТЫ" value={k?.prompts ?? "—"} />
           <Indicator label="В ПРОДЕ" value={k?.prodActive ?? "—"} />
@@ -199,7 +199,7 @@ function HrMissionControl() {
         <div className="flex items-center gap-1.5 pt-1">
           <span className="inline-flex h-1.5 w-1.5 rounded-full bg-primary pulse-ring" />
           <span className="font-mono text-[10px] text-primary/70">
-            ORBIT STABLE · {k?.events24h?.toLocaleString() ?? 0} оп/24ч
+            ORBIT STABLE · {k?.events24h?.toLocaleString() ?? 0} операций/24ч
           </span>
         </div>
       </div>
@@ -229,12 +229,12 @@ function UserMenu() {
             </Avatar>
             <div className="min-w-0 flex-1 text-left leading-tight">
               <div className="truncate text-sm font-medium">Елена Васкес</div>
-              <div className="font-mono text-[10px] text-primary/60">HR-админ · L4</div>
+              <div className="font-mono text-[10px] text-primary/60">Lead Recruiter · L4</div>
             </div>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top" className="w-52">
-          <DropdownMenuLabel className="font-mono text-xs">elena@astra-hr.io</DropdownMenuLabel>
+          <DropdownMenuLabel className="font-mono text-xs">elena@astra-rec.io</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Профиль оператора</DropdownMenuItem>
           <DropdownMenuItem>API-ключи</DropdownMenuItem>
@@ -267,7 +267,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         </svg>
       </button>
       <div className="flex items-center gap-2 text-sm">
-        <span className="font-mono text-[11px] text-muted-foreground">Astra HR Lab</span>
+        <span className="font-mono text-[11px] text-muted-foreground">Astra Recruiting</span>
         <ChevronRight className="h-3.5 w-3.5 text-primary/40" />
         <span className="font-mono text-[11px] text-primary/60">{code}</span>
         <ChevronRight className="h-3.5 w-3.5 text-primary/40" />
@@ -294,7 +294,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         onClick={() => useNav.getState().navigate("library")}
       >
         <Plus className="h-4 w-4" />
-        <span className="hidden sm:inline">Новый HR-промпт</span>
+        <span className="hidden sm:inline">Новый промпт</span>
       </Button>
     </header>
   );
@@ -323,7 +323,7 @@ function StatusBar() {
           </>
         )}
         <span className="ml-auto text-primary/60">
-          astra-hr-lab v2.0.0 · orbit-build 2026.07.11
+          astra-recruiting v3.0.0 · orbit-build 2026.07.11
         </span>
       </div>
     </footer>

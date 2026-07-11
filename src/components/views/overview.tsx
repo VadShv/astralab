@@ -53,17 +53,17 @@ export function OverviewView() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[11px] font-medium text-primary backdrop-blur">
               <Satellite className="h-3 w-3" />
-              ORBIT-7 · HR PROMPT MISSION CONTROL
+              ORBIT-7 · RECRUITING PROMPT MISSION CONTROL
             </div>
             <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
               Космическая лаборатория{" "}
-              <span className="text-primary text-glow">HR-промптов</span>
+              <span className="text-primary text-glow">промптов для рекрутера</span>
             </h1>
             <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-              Создавайте, версонируйте и тестируйте промпты для скрининга резюме,
-              проведения интервью, онбординга и performance review. Иммутабельные
-              версии, статистически корректные A/B-тесты, LLM-as-judge — всё на
-              орбите вашего HR-конвейера.
+              37 production-ready промптов под задачи рекрутера: скрининг резюме,
+              интервью, офферы, sourcing, аналитика найма. Иммутабельные версии,
+              статистически корректные A/B-тесты, LLM-as-judge — всё для реальной
+              работы рекрутинговой команды.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Button
@@ -93,50 +93,50 @@ export function OverviewView() {
             </div>
           </div>
 
-          {/* HR-модули */}
+          {/* Метрики */}
           <div className="grid grid-cols-2 gap-2.5 lg:gap-3">
-            <HeroStat label="Промптов на орбите" value={k?.versions} icon={GitCommitHorizontal} />
+            <HeroStat label="Версий промптов" value={k?.versions} icon={GitCommitHorizontal} />
             <HeroStat label="A/B миссий" value={k?.activeExperiments} icon={FlaskConical} />
             <HeroStat label="В прод-секторе" value={k?.prodActive} icon={ShieldCheck} />
-            <HeroStat label="HR-операций/24ч" value={k?.events24h ? fmtNum(k.events24h) : "—"} icon={Zap} />
+            <HeroStat label="Операций/24ч" value={k?.events24h ? fmtNum(k.events24h) : "—"} icon={Zap} />
           </div>
         </div>
       </div>
 
-      {/* HR-ДОМЕНЫ — что умеет лаборатория */}
+      {/* Рекрутинговые домены — что умеет лаборатория */}
       <div>
         <div className="mb-3 flex items-center gap-2">
           <Layers className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide">HR-домены лаборатории</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide">Рекрутинговые домены</h2>
           <div className="ml-auto h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <HrDomain
             icon={ScanLine}
-            title="Скрининг резюме"
-            desc="Автоматическая оценка кандидатов против требований вакансии"
-            count="resume-screener · cv-parser"
+            title="Скрининг и sourсing"
+            desc="Скрининг резюме, CV-парсер, boolean-поиск, red flags, personas"
+            count="resume-screener · cv-parser · boolean-search"
             onClick={() => navigate("library")}
           />
           <HrDomain
             icon={UserCheck}
             title="Интервью"
-            desc="Генерация вопросов, оценка ответов, structured interview"
-            count="interview-questions · interview-grader"
+            desc="STAR-вопросы, оценка ответов, behavioral-сценарии, тех.интервью"
+            count="interview-questions · interview-grader · behavioral-script"
             onClick={() => navigate("library")}
           />
           <HrDomain
             icon={FileText}
-            title="Онбординг"
-            desc="Планы 30/60/90, должностные инструкции, welcome-письма"
-            count="onboarding-plan · job-description"
+            title="Офферы и закрытие"
+            desc="Оффер-письма, переговоры, closing-стратегия, сравнение офферов"
+            count="offer-letter · offer-negotiation · candidate-closing"
             onClick={() => navigate("library")}
           />
           <HrDomain
             icon={TrendingUp}
-            title="Performance"
-            desc="Performance review по SBI, OKR, обратная связь, 1:1"
-            count="performance-review · okr-drafter"
+            title="Аналитика найма"
+            desc="Воронка, метрики, pipeline-анализ, DEI-проверка, exit-интервью"
+            count="pipeline-analysis · metrics-analyzer · dei-check"
             onClick={() => navigate("library")}
           />
         </div>
@@ -151,7 +151,7 @@ export function OverviewView() {
         </div>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
-            label="HR-запросов / 24ч"
+            label="Рекрутинг-операций / 24ч"
             value={isLoading ? "—" : fmtNum(k?.events24h ?? 0)}
             icon={Zap}
             delta={{ value: "12.4%", positive: true }}
@@ -162,7 +162,7 @@ export function OverviewView() {
             value={isLoading ? "—" : fmtUsd(k?.cost24hUsd ?? 0)}
             icon={DollarSign}
             delta={{ value: "3.1%", positive: false }}
-            hint="по всем HR-вариантам"
+            hint="по всем рекрутинг-вариантам"
           />
           <KpiCard
             label="Токенов / 24ч"

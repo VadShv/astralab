@@ -386,3 +386,32 @@ Stage Summary:
 - Вкладка «Инструкция» (DOC-09) с подробнейшим руководством по всем 9 вкладкам, всем кнопкам и функциям сервиса.
 - 13 разделов, оглавление с auto-highlight, 23 термина в глоссарии, 4 типичных сценария.
 - Браузер-верификация пройдена, функциональность сохранена.
+
+---
+Task ID: 9
+Agent: Z.ai Code (main)
+Task: Оставить только рекрутинговые промпты, создать 37 подробнейших промптов под задачи рекрутера, перевести сервис в режим реальной работы.
+
+Work Log:
+- Создал src/data/prompts/recruiting.ts — 37 подробнейших production-ready промптов для задач рекрутера. Системные промпты 133-278 слов (среднее 184), с методиками, форматами вывода, анти-дискриминацией (ТК РФ ст. 3/64, 152-ФЗ).
+- 37 промптов по рекрутинговым доменам:
+  • Скрининг: resume-screener (с variant experiment/soft-skills), cv-parser-extractor, candidate-red-flags, candidate-persona
+  • Sourcing: boolean-search-strings, cold-outreach-email, linkedin-outreach-message, follow-up-sequence, passive-candidate-outreach, candidate-re-engagement
+  • Интервью: structured-interview-questions, interview-answer-grader, behavioral-interview-script, technical-interview-questions, reference-check-questions, skills-assessment-design, culture-fit-assessment
+  • Офферы: offer-letter, offer-negotiation-prep, salary-benchmarking, offer-comparison, candidate-closing
+  • Контент: job-description-builder, job-ad-linkedin, job-ad-hh-ru, rejection-feedback
+  • Аналитика: candidate-debrief-summary, interview-feedback-aggregator, candidate-pipeline-analysis, recruitment-metrics-analyzer
+  • Стратегия: hiring-manager-briefing, requirements-clarification, diversity-inclusion-check, talent-pool-segmentation, employer-brand-recruiting
+  • Handoff/Retention: onboarding-handoff, exit-interview-recruiter
+- Обновил seed.ts: только RECRUITING_PROMPTS (убрал marketing/development/business/education/creative/professional/hr). Организация «Astra Recruiting», проект «Рекрутинговая лаборатория», пользователи @astra-rec.io.
+- Обновил брендинг app-shell: «ASTRA RECRUITING · v3.0 recruiting lab», «Рекрутинг-сектор», Lead Recruiter · L4, breadcrumb «Astra Recruiting».
+- Обновил overview: hero «Космическая лаборатория промптов для рекрутера», 4 рекрутинговых домена (Скрининг и sourсing / Интервью / Офферы и закрытие / Аналитика найма).
+- Итог в БД: 37 промптов, 38 версий (37 main + 1 variant), 38 веток, 74 тега, 60 активных версий, 1 эксперимент, 6000 событий, 76 audit-записей.
+- Проверил в Agent Browser: брендинг ASTRA RECRUITING, рекрутинговые домены, библиотека 37 промптов (все рекрутинговые), playground с реальным LLM (вернул employer brand strategy для Vercel).
+- 0 ошибок в рантайме, lint чист.
+
+Stage Summary:
+- Сервис переведён из демо-режима в реальную работу: 37 production-ready промптов под конкретные задачи рекрутера.
+- Все промпты — рекрутинговые (скрининг, sourсing, интервью, офферы, аналитика, стратегия).
+- Брендинг: Astra Recruiting v3.0, рекрутинговая лаборатория.
+- Браузер-верификация пройдена, LLM-вызовы работают.
