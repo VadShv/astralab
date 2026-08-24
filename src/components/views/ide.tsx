@@ -22,6 +22,7 @@ import {
   Coins,
   GitCommitHorizontal,
   FileDiff,
+  GitCompare,
   Clock,
   Trash2,
 } from "lucide-react";
@@ -48,74 +49,18 @@ import {
 import { useNav } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 import { extractVariables, type PromptContent, type PromptVariable, type ModelConfig } from "@/lib/prompt";
+import { streamRun, type RunResult } from "@/lib/stream-client";
 import { VersionPanel, type VersionItem } from "@/components/ide/version-panel";
 import { DiffViewer, type DiffVersion } from "@/components/ide/diff-viewer";
 import { BranchSelector } from "@/components/ide/branch-selector";
+import { ModelCompareDialog } from "@/components/ide/model-compare";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
-
-interface RunResult {
-  output: string;
-  streaming: boolean;
-  usage?: { tokensIn: number; tokensOut: number; total: number };
-  latencyMs?: number;
-  model?: string;
-  error?: string;
-}
 
 interface TestCase {
   id: string;
   name: string;
   inputs: Record<string, unknown>;
-}
-
-/** Read an SSE stream from /api/playground/stream and invoke callbacks. */
-async function streamRun(
-  body: Record<string, unknown>,
-  cb: {
-    onToken: (t: string) => void;
-    onDone: (usage: any, model: string) => void;
-    onError: (e: string) => void;
-  },
-  signal?: AbortSignal
-) {
-  try {
-    const res = await fetch("/api/playground/stream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal,
-    });
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      cb.onError(data.error ?? `HTTP ${res.status}`);
-      return;
-    }
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const events = buffer.split("\n\n");
-      buffer = events.pop() ?? "";
-      for (const evt of events) {
-        const line = evt.trim();
-        if (!line.startsWith("data: ")) continue;
-        try {
-          const chunk = JSON.parse(line.slice(6));
-          if (chunk.token) cb.onToken(chunk.token);
-          if (chunk.done) cb.onDone(chunk.usage, chunk.model);
-          if (chunk.error) cb.onError(chunk.error);
-        } catch {
-          /* skip */
-        }
-      }
-    }
-  } catch (e: any) {
-    if (e?.name !== "AbortError") cb.onError(e?.message ?? "stream error");
-  }
 }
 
 export function IdeView() {
@@ -168,6 +113,9 @@ export function IdeView() {
   const [diffOpen, setDiffOpen] = React.useState(false);
   const [diffFromId, setDiffFromId] = React.useState<string>("");
   const [diffToId, setDiffToId] = React.useState<string>("");
+
+  // --- model compare ---
+  const [compareOpen, setCompareOpen] = React.useState(false);
 
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
@@ -565,6 +513,9 @@ export function IdeView() {
           <Button size="sm" variant="outline" onClick={openDiffToolbar} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2}>
             <FileDiff className="mr-1.5 h-4 w-4" /> Сравнить
           </Button>
+          <Button size="sm" variant="outline" onClick={() => setCompareOpen(true)} disabled={!selectedPromptId || models.filter((m: any) => m.provider?.isActive).length < 2}>
+            <GitCompare className="mr-1.5 h-4 w-4" /> Модели
+          </Button>
         </div>
       </div>
 
@@ -850,6 +801,18 @@ export function IdeView() {
         onFromChange={setDiffFromId}
         onToChange={setDiffToId}
         onApply={applyDiffVersion}
+      />
+
+      {/* Model compare */}
+      <ModelCompareDialog
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        models={models}
+        versionId={selectedVersionId}
+        content={content}
+        variables={declaredVars}
+        modelConfig={modelConfig}
+        inputs={inputs}
       />
     </div>
   );
