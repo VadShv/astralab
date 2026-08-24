@@ -21,6 +21,7 @@ import {
   Zap,
   Coins,
   GitCommitHorizontal,
+  FileDiff,
   Clock,
   Trash2,
 } from "lucide-react";
@@ -48,6 +49,7 @@ import { useNav } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 import { extractVariables, type PromptContent, type PromptVariable, type ModelConfig } from "@/lib/prompt";
 import { VersionPanel, type VersionItem } from "@/components/ide/version-panel";
+import { DiffViewer, type DiffVersion } from "@/components/ide/diff-viewer";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -160,6 +162,11 @@ export function IdeView() {
   // --- right panel tabs ---
   const [rightTab, setRightTab] = React.useState<"output" | "versions">("output");
 
+  // --- diff viewer ---
+  const [diffOpen, setDiffOpen] = React.useState(false);
+  const [diffFromId, setDiffFromId] = React.useState<string>("");
+  const [diffToId, setDiffToId] = React.useState<string>("");
+
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
   const abortRefs = React.useRef<Record<string, AbortController>>({});
@@ -222,6 +229,53 @@ export function IdeView() {
       setInputs({});
       setResults({});
     }
+  };
+
+  // --- diff viewer ---
+  const diffVersions: DiffVersion[] = React.useMemo(
+    () =>
+      (versionsData?.versions ?? []).map((v: any) => ({
+        id: v.id,
+        semver: v.semver,
+        branch: v.branch,
+        content: v.content,
+        variables: v.variables,
+        modelConfig: v.modelConfig,
+        model: v.model,
+        versionHash: v.versionHash,
+      })),
+    [versionsData]
+  );
+
+  const openDiff = (toVer: VersionItem) => {
+    const versions = versionsData?.versions ?? [];
+    const toIdx = versions.findIndex((v: any) => v.id === toVer.id);
+    const fromVer = toIdx > 0 ? versions[toIdx - 1] : versions[0];
+    setDiffFromId(fromVer?.id ?? toVer.id);
+    setDiffToId(toVer.id);
+    setDiffOpen(true);
+  };
+
+  const openDiffToolbar = () => {
+    const versions = versionsData?.versions ?? [];
+    if (versions.length < 2) return;
+    const curIdx = versions.findIndex((v: any) => v.id === selectedVersionId);
+    const to = versions[curIdx] ?? versions[versions.length - 1];
+    const from = versions[Math.max(0, (curIdx ?? versions.length - 1) - 1)];
+    setDiffFromId(from.id);
+    setDiffToId(to.id);
+    setDiffOpen(true);
+  };
+
+  const applyDiffVersion = (v: DiffVersion) => {
+    setSelectedVersionId(v.id);
+    setContent(v.content);
+    setDeclaredVars(v.variables);
+    setModelConfig(v.modelConfig);
+    setModelId(v.model?.id ?? "");
+    setInputs({});
+    setResults({});
+    toast.info(`Загружена версия ${v.semver}`);
   };
 
   // --- draft auto-save ---
@@ -471,6 +525,9 @@ export function IdeView() {
           <Button size="sm" variant="outline" onClick={saveVersion} disabled={!selectedPromptId}>
             <Save className="mr-1.5 h-4 w-4" /> Версия
           </Button>
+          <Button size="sm" variant="outline" onClick={openDiffToolbar} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2}>
+            <FileDiff className="mr-1.5 h-4 w-4" /> Сравнить
+          </Button>
         </div>
       </div>
 
@@ -715,6 +772,7 @@ export function IdeView() {
               }))}
               selectedVersionId={selectedVersionId}
               onSelectVersion={selectVersion}
+              onCompare={openDiff}
             />
           )}
         </div>
@@ -744,6 +802,18 @@ export function IdeView() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Diff viewer */}
+      <DiffViewer
+        open={diffOpen}
+        onOpenChange={setDiffOpen}
+        versions={diffVersions}
+        fromId={diffFromId}
+        toId={diffToId}
+        onFromChange={setDiffFromId}
+        onToChange={setDiffToId}
+        onApply={applyDiffVersion}
+      />
     </div>
   );
 }
