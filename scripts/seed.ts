@@ -50,9 +50,9 @@ async function main() {
   });
 
   console.log("Создание провайдера и модели по умолчанию...");
-  const providerName = process.env.DEFAULT_PROVIDER_NAME ?? "Cloud.ru";
-  const providerUrl = process.env.DEFAULT_PROVIDER_BASE_URL ?? "https://api.cloud.ru/v1";
-  const providerKey = process.env.DEFAULT_PROVIDER_API_KEY ?? "placeholder-key";
+  const providerName = process.env.DEFAULT_PROVIDER_NAME || "Cloud.ru";
+  const providerUrl = process.env.DEFAULT_PROVIDER_BASE_URL || "https://api.cloud.ru/v1";
+  const providerKey = process.env.DEFAULT_PROVIDER_API_KEY || "placeholder-key";
   const { enc, iv } = encrypt(providerKey);
   const provider = await db.provider.create({
     data: {
@@ -63,7 +63,7 @@ async function main() {
       isActive: !!process.env.DEFAULT_PROVIDER_API_KEY,
     },
   });
-  const modelExternalId = process.env.DEFAULT_MODEL_ID ?? "gpt-4o-mini";
+  const modelExternalId = process.env.DEFAULT_MODEL_ID || "gpt-4o-mini";
   const defaultModel = await db.model.create({
     data: {
       providerId: provider.id,
