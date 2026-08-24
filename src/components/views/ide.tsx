@@ -20,6 +20,7 @@ import {
   Cpu,
   Zap,
   Coins,
+  GitCommitHorizontal,
   Clock,
   Trash2,
 } from "lucide-react";
@@ -46,6 +47,7 @@ import {
 import { useNav } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 import { extractVariables, type PromptContent, type PromptVariable, type ModelConfig } from "@/lib/prompt";
+import { VersionPanel, type VersionItem } from "@/components/ide/version-panel";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -155,6 +157,9 @@ export function IdeView() {
   const [testCases, setTestCases] = React.useState<TestCase[]>([]);
   const [activeTcId, setActiveTcId] = React.useState<string | null>(null);
 
+  // --- right panel tabs ---
+  const [rightTab, setRightTab] = React.useState<"output" | "versions">("output");
+
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
   const abortRefs = React.useRef<Record<string, AbortController>>({});
@@ -204,6 +209,20 @@ export function IdeView() {
     setResults({});
     setActiveTcId(null);
   }, [versionsData]);
+
+  // --- load a specific version into the editor ---
+  const selectVersion = (v: VersionItem) => {
+    setSelectedVersionId(v.id);
+    const full = (versionsData?.versions ?? []).find((x: any) => x.id === v.id);
+    if (full) {
+      setContent(full.content ?? { system: "", user: "" });
+      setDeclaredVars(full.variables ?? []);
+      setModelConfig(full.modelConfig ?? DEFAULT_CONFIG);
+      setModelId(full.model?.id ?? "");
+      setInputs({});
+      setResults({});
+    }
+  };
 
   // --- draft auto-save ---
   React.useEffect(() => {
@@ -630,30 +649,74 @@ export function IdeView() {
           )}
         </div>
 
-        {/* Output */}
+        {/* Output / Versions panel */}
         <div className="flex w-[42%] shrink-0 flex-col overflow-hidden rounded-lg border border-primary/10 bg-card">
-          <div className="border-b px-3 py-2 text-xs font-medium text-muted-foreground">
-            Результат LLM
+          {/* Tabs */}
+          <div className="flex border-b">
+            <button
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors",
+                rightTab === "output" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setRightTab("output")}
+            >
+              <Play className="h-3.5 w-3.5" /> Результат
+              {resultKeys.length > 0 && (
+                <span className="rounded bg-primary/10 px-1 text-[10px]">{resultKeys.length}</span>
+              )}
+            </button>
+            <button
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors",
+                rightTab === "versions" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setRightTab("versions")}
+            >
+              <GitCommitHorizontal className="h-3.5 w-3.5" /> Версии
+              {(versionsData?.versions?.length ?? 0) > 0 && (
+                <span className="rounded bg-primary/10 px-1 text-[10px]">{versionsData?.versions?.length}</span>
+              )}
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-3">
-            {resultKeys.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
-                <Play className="mb-2 h-8 w-8 opacity-30" />
-                <p className="text-xs">Нажмите «Запуск» для выполнения промпта</p>
-                <p className="mt-1 text-[10px]">Ответ появится здесь в реальном времени</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {resultKeys.map((key) => {
-                  const r = results[key];
-                  const tcName = key === "custom" ? "Текущий ввод" : testCases.find((t) => t.id === key)?.name ?? key;
-                  return (
-                    <ResultCard key={key} name={tcName} result={r} inputs={key === "custom" ? inputs : testCases.find((t) => t.id === key)?.inputs ?? {}} />
-                  );
-                })}
-              </div>
-            )}
-          </div>
+
+          {/* Tab content */}
+          {rightTab === "output" ? (
+            <div className="flex-1 overflow-y-auto p-3">
+              {resultKeys.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                  <Play className="mb-2 h-8 w-8 opacity-30" />
+                  <p className="text-xs">Нажмите «Запуск» для выполнения промпта</p>
+                  <p className="mt-1 text-[10px]">Ответ появится здесь в реальном времени</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {resultKeys.map((key) => {
+                    const r = results[key];
+                    const tcName = key === "custom" ? "Текущий ввод" : testCases.find((t) => t.id === key)?.name ?? key;
+                    return (
+                      <ResultCard key={key} name={tcName} result={r} inputs={key === "custom" ? inputs : testCases.find((t) => t.id === key)?.inputs ?? {}} />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <VersionPanel
+              versions={(versionsData?.versions ?? []).map((v: any) => ({
+                id: v.id,
+                versionHash: v.versionHash,
+                semver: v.semver,
+                branch: v.branch,
+                commitMessage: v.commitMessage,
+                status: v.status,
+                createdAt: v.createdAt,
+                author: v.author,
+                model: v.model,
+              }))}
+              selectedVersionId={selectedVersionId}
+              onSelectVersion={selectVersion}
+            />
+          )}
         </div>
       </div>
 
