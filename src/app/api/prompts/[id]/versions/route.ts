@@ -14,6 +14,7 @@ export async function GET(
     include: {
       author: { select: { id: true, name: true, avatarColor: true } },
       tags: { select: { id: true, name: true } },
+      model: { select: { id: true, displayName: true } },
     },
   });
 
@@ -25,15 +26,16 @@ export async function GET(
       versionHash: v.versionHash,
       semver: v.semver,
       branch: v.branch,
-      content: v.content as PromptContent,
-      variables: v.variables as PromptVariable[],
-      modelConfig: v.modelConfig as ModelConfig,
+      content: v.content as unknown as PromptContent,
+      variables: v.variables as unknown as PromptVariable[],
+      modelConfig: v.modelConfig as unknown as ModelConfig,
       parentVersionId: v.parentVersionId,
       commitMessage: v.commitMessage,
       author: v.author,
       status: v.status,
       createdAt: v.createdAt,
       tags: v.tags,
+      model: v.model,
     })),
     branches: branches.map((b) => ({ id: b.id, name: b.name, headVersionId: b.headVersionId })),
   });
@@ -55,6 +57,7 @@ export async function POST(
     commitMessage,
     semverKind,
     semver,
+    modelId,
   } = body as {
     content: PromptContent;
     variables: PromptVariable[];
@@ -64,6 +67,7 @@ export async function POST(
     commitMessage: string;
     semverKind?: "patch" | "minor" | "major";
     semver?: string;
+    modelId?: string;
   };
 
   if (!content || !commitMessage)
@@ -108,6 +112,7 @@ export async function POST(
       parentVersionId: parentVersionId ?? null,
       commitMessage,
       authorId: userId,
+      modelId: modelId ?? null,
       status: "draft",
     },
   });

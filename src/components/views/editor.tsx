@@ -69,11 +69,18 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
   });
   const branches = promptData?.prompt?.branches ?? [];
 
+  const { data: modelsData } = useQuery({
+    queryKey: ["models"],
+    queryFn: () => fetch("/api/models").then((r) => r.json()),
+  });
+  const models: { id: string; displayName: string; provider: { name: string } }[] = modelsData?.models ?? [];
+
   const [readOnly, setReadOnly] = React.useState(!!versionId);
   const [versionIdLocal, setVersionIdLocal] = React.useState<string | null>(versionId ?? null);
   const [content, setContent] = React.useState<PromptContent>({ system: "", user: "" });
   const [variables, setVariables] = React.useState<PromptVariable[]>([]);
   const [modelConfig, setModelConfig] = React.useState<ModelConfig>(DEFAULT_CONFIG);
+  const [modelId, setModelId] = React.useState<string>("");
   const [branch, setBranch] = React.useState("main");
   const [commitMessage, setCommitMessage] = React.useState("");
   const [semverKind, setSemverKind] = React.useState<"patch" | "minor" | "major">("patch");
@@ -85,6 +92,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
       setVariables(version.variables ?? []);
       setModelConfig(version.modelConfig ?? DEFAULT_CONFIG);
       setBranch(version.branch);
+      setModelId(version.model?.id ?? "");
     }
   }, [version]);
 
@@ -164,6 +172,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                   parentVersionId: versionIdLocal ?? versionId ?? null,
                   commitMessage,
                   semverKind,
+                  modelId: modelId || undefined,
                 })
               }
             >
@@ -358,6 +367,26 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
 
             <TabsContent value="config" className="mt-3">
               <Card className="p-4 space-y-5">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Модель (override для версии)</Label>
+                  <Select
+                    value={modelId || "__none__"}
+                    onValueChange={(v) => setModelId(v === "__none__" ? "" : v)}
+                    disabled={isReadOnly}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="По умолчанию" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">По умолчанию (модель промпта)</SelectItem>
+                      {models.map((m) => (
+                        <SelectItem key={m.id} value={m.id}>
+                          {m.displayName} ({m.provider.name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div>
                   <div className="mb-2 flex justify-between text-xs">
                     <span className="font-medium">temperature</span>

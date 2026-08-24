@@ -11,7 +11,8 @@ export type ViewKey =
   | "playground"
   | "experiments"
   | "deployment"
-  | "audit";
+  | "audit"
+  | "settings";
 
 interface NavState {
   view: ViewKey;

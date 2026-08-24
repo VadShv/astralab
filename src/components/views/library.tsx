@@ -25,6 +25,13 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useNav } from "@/lib/nav-store";
 import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -160,7 +167,7 @@ function PromptCard({ prompt, onOpen }: { prompt: any; onOpen: () => void }) {
       </div>
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
-        <span>{prompt.defaultModel}</span>
+        <span>{prompt.defaultModel?.displayName ?? "—"}</span>
         <span>обновлён {timeAgo(prompt.createdAt)}</span>
       </div>
     </Card>
@@ -190,7 +197,20 @@ function CreatePromptDialog({
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [tagsStr, setTagsStr] = React.useState("");
-  const [model, setModel] = React.useState("glm-4.6");
+  const [modelId, setModelId] = React.useState<string>("");
+
+  const { data: modelsData } = useQuery({
+    queryKey: ["models"],
+    queryFn: () => fetch("/api/models").then((r) => r.json()),
+  });
+  const models: { id: string; displayName: string; isDefault: boolean; provider: { name: string } }[] = modelsData?.models ?? [];
+
+  React.useEffect(() => {
+    if (!modelId && models.length > 0) {
+      const def = models.find((m) => m.isDefault) ?? models[0];
+      setModelId(def.id);
+    }
+  }, [models, modelId]);
 
   const mut = useMutation({
     mutationFn: (body: any) =>
@@ -252,7 +272,18 @@ function CreatePromptDialog({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="pm">Модель по умолчанию</Label>
-              <Input id="pm" value={model} onChange={(e) => setModel(e.target.value)} />
+              <Select value={modelId} onValueChange={setModelId}>
+                <SelectTrigger id="pm">
+                  <SelectValue placeholder="Выберите модель…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.displayName} ({m.provider.name})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -267,7 +298,7 @@ function CreatePromptDialog({
                 name,
                 description,
                 tags: tagsStr.split(",").map((t) => t.trim()).filter(Boolean),
-                defaultModel: model,
+                defaultModelId: modelId || undefined,
               })
             }
           >

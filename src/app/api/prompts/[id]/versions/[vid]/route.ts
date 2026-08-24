@@ -20,9 +20,9 @@ export async function GET(
   return NextResponse.json({
     version: {
       ...version,
-      content: version.content as PromptContent,
-      variables: version.variables as PromptVariable[],
-      modelConfig: version.modelConfig as ModelConfig,
+      content: version.content as unknown as PromptContent,
+      variables: version.variables as unknown as PromptVariable[],
+      modelConfig: version.modelConfig as unknown as ModelConfig,
     },
   });
 }

@@ -4,7 +4,7 @@ export interface SeedPrompt {
   name: string;
   description: string;
   tags: string[];
-  defaultModel: string;
+  defaultModel?: string;
   category: string;
   /** Main-branch version content. */
   content: PromptContent;

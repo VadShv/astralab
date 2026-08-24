@@ -8,7 +8,6 @@ export async function GET(
   const { id } = await params;
   const branches = await db.branch.findMany({
     where: { promptId: id },
-    include: { headVersion: { select: { id: true, semver: true, status: true } } },
   });
   return NextResponse.json({ branches });
 }

@@ -3,6 +3,7 @@ import { computeVersionHash } from "../src/lib/prompt";
 import type { ModelConfig, PromptContent, PromptVariable } from "../src/lib/prompt";
 import { RECRUITING_PROMPTS } from "../src/data/prompts/recruiting";
 import type { SeedPrompt } from "../src/data/prompts/types";
+import { encrypt } from "../src/lib/crypto";
 
 const ALL: SeedPrompt[] = [...RECRUITING_PROMPTS];
 
@@ -21,6 +22,8 @@ async function main() {
   await db.auditLog.deleteMany();
   await db.project.deleteMany();
   await db.organization.deleteMany();
+  await db.model.deleteMany();
+  await db.provider.deleteMany();
   await db.user.deleteMany();
 
   console.log("Создание пользователей...");
@@ -46,6 +49,34 @@ async function main() {
     },
   });
 
+  console.log("Создание провайдера и модели по умолчанию...");
+  const providerName = process.env.DEFAULT_PROVIDER_NAME ?? "Cloud.ru";
+  const providerUrl = process.env.DEFAULT_PROVIDER_BASE_URL ?? "https://api.cloud.ru/v1";
+  const providerKey = process.env.DEFAULT_PROVIDER_API_KEY ?? "placeholder-key";
+  const { enc, iv } = encrypt(providerKey);
+  const provider = await db.provider.create({
+    data: {
+      name: providerName,
+      baseUrl: providerUrl,
+      apiKeyEnc: enc,
+      apiKeyIv: iv,
+      isActive: !!process.env.DEFAULT_PROVIDER_API_KEY,
+    },
+  });
+  const modelExternalId = process.env.DEFAULT_MODEL_ID ?? "gpt-4o-mini";
+  const defaultModel = await db.model.create({
+    data: {
+      providerId: provider.id,
+      externalId: modelExternalId,
+      displayName: modelExternalId,
+      isDefault: true,
+    },
+  });
+  await db.organization.update({
+    where: { id: org.id },
+    data: { judgeModelId: defaultModel.id },
+  });
+
   // Все рекрутинговые промпты — в production
   const categoryEnv: Record<string, "development" | "staging" | "production"> = {
     "Рекрутинг": "production",
@@ -67,7 +98,7 @@ async function main() {
         name: sp.name,
         description: sp.description,
         tags: sp.tags,
-        defaultModel: sp.defaultModel,
+        defaultModelId: defaultModel.id,
       },
     });
 
@@ -303,6 +334,8 @@ async function main() {
     db.experiment.count({ where: { prompt: { projectId: project.id } } }),
     db.experimentEvent.count(),
     db.auditLog.count({ where: { projectId: project.id } }),
+    db.provider.count(),
+    db.model.count(),
   ]);
   console.log("=== Сводка ===");
   console.log(JSON.stringify({
@@ -314,6 +347,8 @@ async function main() {
     experiments: counts[5],
     experimentEvents: counts[6],
     auditLogs: counts[7],
+    providers: counts[8],
+    models: counts[9],
   }, null, 2));
 }
 

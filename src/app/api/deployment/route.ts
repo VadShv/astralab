@@ -8,6 +8,7 @@ export async function GET() {
     where: { projectId, archivedAt: null },
     orderBy: { name: "asc" },
     include: {
+      defaultModel: { select: { id: true, displayName: true } },
       activeVersions: { include: { version: true, activator: { select: { name: true } } } },
       versions: {
         orderBy: { createdAt: "desc" },
@@ -37,7 +38,7 @@ export async function GET() {
       return {
         promptId: p.id,
         promptName: p.name,
-        defaultModel: p.defaultModel,
+        defaultModel: p.defaultModel?.displayName ?? null,
         environments: byEnv,
         recentVersions: p.versions,
       };

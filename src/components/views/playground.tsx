@@ -76,6 +76,13 @@ export function PlaygroundView() {
   const [results, setResults] = React.useState<Record<string, RunResult | undefined>>({});
   const [running, setRunning] = React.useState<Record<string, boolean>>({});
   const [evals, setEvals] = React.useState<Record<string, EvalResult | undefined>>({});
+  const [modelOverride, setModelOverride] = React.useState<string>("");
+
+  const { data: modelsData } = useQuery({
+    queryKey: ["models"],
+    queryFn: () => fetch("/api/models").then((r) => r.json()),
+  });
+  const models: { id: string; displayName: string; provider: { name: string } }[] = modelsData?.models ?? [];
 
   const run = async (versionId: string) => {
     setRunning((r) => ({ ...r, [versionId]: true }));
@@ -84,7 +91,7 @@ export function PlaygroundView() {
       const res = await fetch("/api/playground/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ versionId, inputs }),
+        body: JSON.stringify({ versionId, inputs, modelId: modelOverride || undefined }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "run failed");
@@ -141,6 +148,15 @@ export function PlaygroundView() {
             <SelectContent>
               {prompts.map((p: any) => (
                 <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={modelOverride || "__auto__"} onValueChange={(v) => setModelOverride(v === "__auto__" ? "" : v)}>
+            <SelectTrigger className="w-[200px]"><SelectValue placeholder="Модель" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__auto__">Модель по умолчанию</SelectItem>
+              {models.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.displayName}</SelectItem>
               ))}
             </SelectContent>
           </Select>

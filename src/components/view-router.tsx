@@ -11,6 +11,7 @@ import { PlaygroundView } from "@/components/views/playground";
 import { ExperimentsView } from "@/components/views/experiments";
 import { DeploymentView } from "@/components/views/deployment";
 import { AuditView } from "@/components/views/audit";
+import { SettingsView } from "@/components/views/settings";
 
 export function ViewRouter() {
   const { view } = useNav();
@@ -33,6 +34,8 @@ export function ViewRouter() {
       return <DeploymentView />;
     case "audit":
       return <AuditView />;
+    case "settings":
+      return <SettingsView />;
     default:
       return <OverviewView />;
   }

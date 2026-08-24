@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
     include: {
       _count: { select: { versions: true, experiments: true } },
+      defaultModel: { select: { id: true, displayName: true } },
       activeVersions: { include: { version: true } },
       versions: {
         where: { status: "active" },
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
       name: p.name,
       description: p.description,
       tags: (p.tags as string[]) ?? [],
-      defaultModel: p.defaultModel,
+      defaultModel: p.defaultModel ? { id: p.defaultModel.id, displayName: p.defaultModel.displayName } : null,
       createdAt: p.createdAt,
       versionCount: p._count.versions,
       experimentCount: p._count.experiments,
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
   const projectId = await getProjectId();
   const userId = await getCurrentUserId();
   const body = await req.json();
-  const { name, description, tags, defaultModel } = body;
+  const { name, description, tags, defaultModelId } = body;
 
   if (!name) return NextResponse.json({ error: "name required" }, { status: 400 });
 
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
         name,
         description: description ?? "",
         tags: tags ?? [],
-        defaultModel: defaultModel ?? "glm-4.6",
+        defaultModelId: defaultModelId ?? null,
       },
     });
     await db.branch.create({ data: { promptId: prompt.id, name: "main" } });

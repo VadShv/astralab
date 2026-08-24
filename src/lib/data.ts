@@ -41,7 +41,7 @@ export async function logAudit(opts: {
       action: opts.action,
       targetType: opts.targetType,
       targetId: opts.targetId,
-      detail: opts.detail ?? {},
+      detail: (opts.detail ?? {}) as any,
     },
   });
 }

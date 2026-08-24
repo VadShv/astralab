@@ -138,7 +138,7 @@ function DeploymentRow({
       {/* prompt cell */}
       <button onClick={onOpenHistory} className="border-r px-4 py-3 text-left hover:bg-muted/30">
         <div className="font-mono text-sm font-semibold text-primary">{row.promptName}</div>
-        <div className="mt-0.5 text-[11px] text-muted-foreground">{row.defaultModel}</div>
+        <div className="mt-0.5 text-[11px] text-muted-foreground">{row.defaultModel ?? "—"}</div>
       </button>
 
       {/* env cells */}

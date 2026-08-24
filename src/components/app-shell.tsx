@@ -17,6 +17,7 @@ import {
   Users,
   Activity,
   BookOpen,
+  Settings,
 } from "lucide-react";
 import { useNav, type ViewKey } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ const NAV: { key: ViewKey; label: string; icon: React.ElementType; group: string
   { key: "experiments", label: "A/B эксперименты", icon: FlaskConical, group: "Исследование", code: "EXP-06" },
   { key: "deployment", label: "Карта развёртывания", icon: Rocket, group: "Релиз", code: "DEP-07" },
   { key: "audit", label: "Журнал аудита", icon: ScrollText, group: "Релиз", code: "AUD-08" },
+  { key: "settings", label: "Настройки", icon: Settings, group: "Релиз", code: "SET-10" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

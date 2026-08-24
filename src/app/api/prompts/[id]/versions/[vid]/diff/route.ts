@@ -18,8 +18,8 @@ export async function GET(
   ]);
   if (!a || !b) return NextResponse.json({ error: "version not found" }, { status: 404 });
 
-  const ac = a.content as PromptContent;
-  const bc = b.content as PromptContent;
+  const ac = a.content as unknown as PromptContent;
+  const bc = b.content as unknown as PromptContent;
 
   return NextResponse.json({
     from: { id: a.id, semver: a.semver, branch: a.branch },

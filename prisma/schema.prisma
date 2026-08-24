@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -29,6 +29,9 @@ model Organization {
   plan      String   @default("growth") // free | starter | growth | enterprise
   createdAt DateTime @default(now())
 
+  judgeModelId String?
+  judgeModel   Model?   @relation("OrgJudgeModel", fields: [judgeModelId], references: [id], onDelete: SetNull)
+
   projects Project[]
 }
 
@@ -51,11 +54,12 @@ model Prompt {
   name          String
   description   String
   tags          Json      // string[]
-  defaultModel  String    @default("glm-4.6")
+  defaultModelId String?
   createdAt     DateTime  @default(now())
   archivedAt    DateTime?
 
   project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  defaultModel  Model?          @relation("PromptDefaultModel", fields: [defaultModelId], references: [id], onDelete: SetNull)
   versions      PromptVersion[]
   branches      Branch[]
   tags_rel      Tag[]
@@ -74,6 +78,7 @@ model PromptVersion {
   content         Json     // { system, user, assistant? turns }
   variables       Json     // [{ name, type, required, default, description }]
   modelConfig     Json     // { temperature, top_p, max_tokens, stop }
+  modelId         String?
   parentVersionId String?
   commitMessage   String
   authorId        String
@@ -81,6 +86,7 @@ model PromptVersion {
   createdAt       DateTime @default(now())
 
   prompt          Prompt        @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  model           Model?        @relation("VersionModel", fields: [modelId], references: [id], onDelete: SetNull)
   author          User          @relation("VersionAuthor", fields: [authorId], references: [id])
   parent          PromptVersion? @relation("VersionParent", fields: [parentVersionId], references: [id], onDelete: SetNull)
   children        PromptVersion[] @relation("VersionParent")
@@ -213,4 +219,34 @@ model AuditLog {
   actor   User?   @relation("AuditActor", fields: [actorId], references: [id])
 
   @@index([projectId])
+}
+
+model Provider {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  baseUrl   String
+  apiKeyEnc String
+  apiKeyIv  String
+  kind      String   @default("openai_compatible")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  models Model[]
+}
+
+model Model {
+  id           String   @id @default(cuid())
+  providerId   String
+  externalId   String
+  displayName  String
+  contextWindow Int?
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  provider       Provider        @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  prompts        Prompt[]        @relation("PromptDefaultModel")
+  versions       PromptVersion[] @relation("VersionModel")
+  judgeForOrgs   Organization[]  @relation("OrgJudgeModel")
+
+  @@unique([providerId, externalId])
 }

@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { db } from "@/lib/db";
+import { chatCompletion } from "@/lib/llm";
+
+/** Resolve the judge model: org setting > default model > first available. */
+async function resolveJudgeModelId(): Promise<string | null> {
+  const project = await db.project.findFirst({ include: { organization: true } });
+  const orgJudge = project?.organization?.judgeModelId;
+  if (orgJudge) return orgJudge;
+  const def = await db.model.findFirst({ where: { isDefault: true } });
+  if (def) return def.id;
+  const any = await db.model.findFirst();
+  return any?.id ?? null;
+}
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
@@ -30,17 +42,21 @@ ${body.input}
 Response to evaluate:
 ${body.output}`;
 
+  const judgeModelId = await resolveJudgeModelId();
+  if (!judgeModelId) {
+    return NextResponse.json({ error: "No judge model configured. Add a model in Settings." }, { status: 400 });
+  }
+
   try {
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
+    const result = await chatCompletion({
+      modelId: judgeModelId,
       messages: [
-        { role: "assistant", content: judgeSystem },
+        { role: "system", content: judgeSystem },
         { role: "user", content: judgeUser },
       ],
       temperature: 0,
-      thinking: { type: "disabled" },
     });
-    const raw = completion.choices[0]?.message?.content ?? "";
+    const raw = result.output;
     // extract JSON
     const m = raw.match(/\{[\s\S]*\}/);
     let parsed: { score?: number; reason?: string } = {};

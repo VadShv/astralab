@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import {
-  summarize,
   twoProportionTest,
   welchTTest,
   sequentialTest,
@@ -12,10 +12,34 @@ import {
 } from "@/lib/stats";
 import type { GuardrailMetric } from "@/lib/prompt";
 
-function pctile(sorted: number[], p: number): number {
-  if (sorted.length === 0) return 0;
-  const idx = Math.min(sorted.length - 1, Math.floor((p / 100) * (sorted.length - 1)));
-  return sorted[idx];
+interface AggRow {
+  variantId: string;
+  n: number;
+  eval_mean: number | null;
+  eval_std: number | null;
+  eval_sum: number | null;
+  lat_mean: number | null;
+  lat_std: number | null;
+  lat_p50: number | null;
+  lat_p95: number | null;
+  lat_p99: number | null;
+  cost_mean: number | null;
+  cost_std: number | null;
+  cost_total: number | null;
+  tokens_in: number | null;
+  tokens_out: number | null;
+}
+
+interface VariantResult {
+  variantId: string;
+  name: string;
+  version: { semver: string; branch: string; commitMessage: string };
+  trafficWeight: number;
+  n: number;
+  primary: { metric: string; mean: number; successes?: number; rate?: number; std: number };
+  latency: { mean: number; p50: number; p95: number; p99: number; std: number };
+  cost: { mean: number; total: number; std: number };
+  tokens: { in: number; out: number; total: number };
 }
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -30,60 +54,67 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   });
   if (!experiment) return NextResponse.json({ error: "not found" }, { status: 404 });
 
-  const events = await db.experimentEvent.findMany({
-    where: { experimentId: id },
-    orderBy: { createdAt: "asc" },
-  });
-
   const confidenceLevel = experiment.confidenceLevel;
-  const guardrails = (experiment.guardrailMetrics as GuardrailMetric[]) ?? [];
+  const guardrails = (experiment.guardrailMetrics as unknown as GuardrailMetric[]) ?? [];
+  const isBinary = experiment.primaryMetric === "eval_pass_rate" || experiment.primaryMetric === "error_rate";
 
-  // group events by variant
-  const byVariant: Record<string, typeof events> = {};
-  for (const e of events) {
-    (byVariant[e.variantId] ??= []).push(e);
-  }
+  // Per-variant descriptive stats via SQL aggregation (avoids loading all events into JS).
+  const aggRows = await db.$queryRaw<AggRow[]>(Prisma.sql`
+    SELECT
+      "variantId",
+      COUNT(*)::int AS n,
+      AVG("metricValue") AS eval_mean,
+      STDDEV_SAMP("metricValue") AS eval_std,
+      SUM("metricValue") AS eval_sum,
+      AVG("latencyMs") AS lat_mean,
+      STDDEV_SAMP("latencyMs") AS lat_std,
+      percentile_cont(0.50) WITHIN GROUP (ORDER BY "latencyMs") AS lat_p50,
+      percentile_cont(0.95) WITHIN GROUP (ORDER BY "latencyMs") AS lat_p95,
+      percentile_cont(0.99) WITHIN GROUP (ORDER BY "latencyMs") AS lat_p99,
+      AVG("costUsd") AS cost_mean,
+      STDDEV_SAMP("costUsd") AS cost_std,
+      SUM("costUsd") AS cost_total,
+      SUM("tokensIn")::int AS tokens_in,
+      SUM("tokensOut")::int AS tokens_out
+    FROM "ExperimentEvent"
+    WHERE "experimentId" = ${id}
+    GROUP BY "variantId"
+  `);
+  const aggByVariant: Record<string, AggRow> = {};
+  for (const r of aggRows) aggByVariant[r.variantId] = r;
 
   const controlVariant = experiment.variants.find((v) => v.name === "control") ?? experiment.variants[0];
 
-  // per-variant metric summaries
-  const variantResults = experiment.variants.map((v) => {
-    const evs = byVariant[v.id] ?? [];
-    const evalValues = evs.map((e) => e.metricValue);
-    const latencies = evs.map((e) => e.latencyMs).sort((a, b) => a - b);
-    const costs = evs.map((e) => e.costUsd);
-    const tokensIn = evs.reduce((a, e) => a + e.tokensIn, 0);
-    const tokensOut = evs.reduce((a, e) => a + e.tokensOut, 0);
-
-    const evalStats = summarize(v.name, evalValues);
-    const latStats = summarize(v.name, latencies);
-    const costStats = summarize(v.name, costs);
-
-    const isBinary = experiment.primaryMetric === "eval_pass_rate" || experiment.primaryMetric === "error_rate";
-    const rate = isBinary ? evalStats.mean : evalStats.mean;
+  const variantResults: VariantResult[] = experiment.variants.map((v) => {
+    const a = aggByVariant[v.id];
+    const n = a?.n ?? 0;
+    const evalMean = a?.eval_mean ?? 0;
+    const evalStd = a?.eval_std ?? 0;
+    const evalSum = a?.eval_sum ?? 0;
+    const rate = evalMean;
 
     return {
       variantId: v.id,
       name: v.name,
       version: v.version,
       trafficWeight: v.trafficWeight,
-      n: evs.length,
+      n,
       primary: {
         metric: experiment.primaryMetric,
         mean: rate,
         ...(isBinary
-          ? { successes: evalStats.sum, rate, std: evalStats.std }
-          : { std: evalStats.std }),
+          ? { successes: evalSum, rate, std: evalStd }
+          : { std: evalStd }),
       },
       latency: {
-        mean: latStats.mean,
-        p50: pctile(latencies, 50),
-        p95: pctile(latencies, 95),
-        p99: pctile(latencies, 99),
-        std: latStats.std,
+        mean: a?.lat_mean ?? 0,
+        p50: a?.lat_p50 ?? 0,
+        p95: a?.lat_p95 ?? 0,
+        p99: a?.lat_p99 ?? 0,
+        std: a?.lat_std ?? 0,
       },
-      cost: { mean: costStats.mean, total: costStats.sum, std: costStats.std },
-      tokens: { in: tokensIn, out: tokensOut, total: tokensIn + tokensOut },
+      cost: { mean: a?.cost_mean ?? 0, total: a?.cost_total ?? 0, std: a?.cost_std ?? 0 },
+      tokens: { in: a?.tokens_in ?? 0, out: a?.tokens_out ?? 0, total: (a?.tokens_in ?? 0) + (a?.tokens_out ?? 0) },
     };
   });
 
@@ -92,7 +123,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const comparisons = variantResults
     .filter((r) => r.variantId !== control.variantId)
     .map((r) => {
-      const isBinary = experiment.primaryMetric === "eval_pass_rate" || experiment.primaryMetric === "error_rate";
       if (isBinary) {
         const test = twoProportionTest(
           { n: control.n, successes: control.primary.successes ?? 0 },
@@ -163,8 +193,15 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     };
   });
 
+  // Lean event fetch (only 3 columns) for sequential test + time series.
+  const leanEvents = await db.experimentEvent.findMany({
+    where: { experimentId: id },
+    select: { variantId: true, metricValue: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+
   // sequential test (always-valid) for early stopping
-  const obs = events.map((e) => ({ variant: e.variantId, value: e.metricValue }));
+  const obs = leanEvents.map((e) => ({ variant: e.variantId, value: e.metricValue }));
   const seq = sequentialTest({
     observations: obs,
     controlName: controlVariant.id,
@@ -174,22 +211,20 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   // sample size / power progress
   const controlRate = control.primary.rate ?? 0.7;
-  const requiredPerVariant =
-    experiment.primaryMetric === "eval_pass_rate" || experiment.primaryMetric === "error_rate"
-      ? sampleSizeBinary({ baselineRate: controlRate, mde: 0.03, confidenceLevel })
-      : sampleSizeContinuous({ baselineStd: control.primary.std || 1, mde: 0.1, confidenceLevel });
+  const requiredPerVariant = isBinary
+    ? sampleSizeBinary({ baselineRate: controlRate, mde: 0.03, confidenceLevel })
+    : sampleSizeContinuous({ baselineStd: control.primary.std || 1, mde: 0.1, confidenceLevel });
   const progressPct = Math.min(100, Math.round((control.n / requiredPerVariant) * 100));
 
   // time series: cumulative rate per variant, bucketed
   const buckets = 24;
-  const minTime = events[0]?.createdAt?.getTime() ?? Date.now();
-  const maxTime = events[events.length - 1]?.createdAt?.getTime() ?? Date.now();
+  const minTime = leanEvents[0]?.createdAt?.getTime() ?? Date.now();
+  const maxTime = leanEvents[leanEvents.length - 1]?.createdAt?.getTime() ?? Date.now();
   const span = Math.max(1, maxTime - minTime);
   const series: { t: number; [variantName: string]: number | string }[] = [];
   const variantNameById: Record<string, string> = {};
   for (const v of experiment.variants) variantNameById[v.id] = v.name;
 
-  // cumulative counters
   const cumCount: Record<string, number> = {};
   const cumSum: Record<string, number> = {};
   for (const v of experiment.variants) {
@@ -199,8 +234,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   let ei = 0;
   for (let b = 0; b <= buckets; b++) {
     const tBoundary = minTime + (span * b) / buckets;
-    while (ei < events.length && events[ei].createdAt.getTime() <= tBoundary) {
-      const e = events[ei];
+    while (ei < leanEvents.length && leanEvents[ei].createdAt.getTime() <= tBoundary) {
+      const e = leanEvents[ei];
       cumCount[e.variantId]++;
       cumSum[e.variantId] += e.metricValue;
       ei++;
@@ -233,6 +268,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       reason: `Sequential (always-valid) test reached significance early — safe to stop and decide.`,
     };
   }
+
+  const totalEvents = aggRows.reduce((s, r) => s + r.n, 0);
 
   return NextResponse.json({
     experiment: {
@@ -271,6 +308,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     series,
     seriesVariantNames: experiment.variants.map((v) => v.name),
     winner,
-    totalEvents: events.length,
+    totalEvents,
   });
 }
