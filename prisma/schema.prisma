@@ -66,6 +66,7 @@ model Prompt {
   experiments   Experiment[]
   activeVersions ActiveVersion[]
   testCases     TestCase[]
+  evalRuns      EvalRun[]
 
   @@unique([projectId, name])
 }
@@ -258,6 +259,22 @@ model TestCase {
   name      String
   inputs    Json     // { varName: value }
   createdAt DateTime @default(now())
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([promptId])
+}
+
+model EvalRun {
+  id         String   @id @default(cuid())
+  promptId   String
+  versionId  String?
+  modelId    String?
+  passRate   Float
+  avgScore   Float
+  totalCount Int
+  results    Json     // [{ testCaseId, testCaseName, output, score, reason, tokens, latencyMs }]
+  createdAt  DateTime @default(now())
 
   prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
 

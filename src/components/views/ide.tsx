@@ -54,6 +54,7 @@ import { VersionPanel, type VersionItem } from "@/components/ide/version-panel";
 import { DiffViewer, type DiffVersion } from "@/components/ide/diff-viewer";
 import { BranchSelector } from "@/components/ide/branch-selector";
 import { ModelCompareDialog } from "@/components/ide/model-compare";
+import { BatchEvalDialog } from "@/components/ide/batch-eval";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -116,6 +117,9 @@ export function IdeView() {
 
   // --- model compare ---
   const [compareOpen, setCompareOpen] = React.useState(false);
+
+  // --- batch eval ---
+  const [batchEvalOpen, setBatchEvalOpen] = React.useState(false);
 
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
@@ -516,6 +520,9 @@ export function IdeView() {
           <Button size="sm" variant="outline" onClick={() => setCompareOpen(true)} disabled={!selectedPromptId || models.filter((m: any) => m.provider?.isActive).length < 2}>
             <GitCompare className="mr-1.5 h-4 w-4" /> Модели
           </Button>
+          <Button size="sm" variant="outline" onClick={() => setBatchEvalOpen(true)} disabled={!selectedPromptId || testCases.length === 0}>
+            <FlaskConical className="mr-1.5 h-4 w-4" /> Батч
+          </Button>
         </div>
       </div>
 
@@ -813,6 +820,19 @@ export function IdeView() {
         variables={declaredVars}
         modelConfig={modelConfig}
         inputs={inputs}
+      />
+
+      {/* Batch eval */}
+      <BatchEvalDialog
+        open={batchEvalOpen}
+        onOpenChange={setBatchEvalOpen}
+        promptId={selectedPromptId}
+        testCases={testCases}
+        versionId={selectedVersionId}
+        content={content}
+        variables={declaredVars}
+        modelConfig={modelConfig}
+        modelId={modelId}
       />
     </div>
   );
