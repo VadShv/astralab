@@ -65,6 +65,7 @@ model Prompt {
   tags_rel      Tag[]
   experiments   Experiment[]
   activeVersions ActiveVersion[]
+  testCases     TestCase[]
 
   @@unique([projectId, name])
 }
@@ -249,4 +250,16 @@ model Model {
   judgeForOrgs   Organization[]  @relation("OrgJudgeModel")
 
   @@unique([providerId, externalId])
+}
+
+model TestCase {
+  id        String   @id @default(cuid())
+  promptId  String
+  name      String
+  inputs    Json     // { varName: value }
+  createdAt DateTime @default(now())
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([promptId])
 }

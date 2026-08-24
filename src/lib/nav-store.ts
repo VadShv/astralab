@@ -3,6 +3,7 @@
 import { create } from "zustand";
 
 export type ViewKey =
+  | "ide"
   | "overview"
   | "library"
   | "instructions"
@@ -23,7 +24,7 @@ interface NavState {
 }
 
 export const useNav = create<NavState>((set) => ({
-  view: "overview",
+  view: "ide",
   promptId: null,
   versionId: null,
   experimentId: null,

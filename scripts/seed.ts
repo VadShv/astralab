@@ -16,6 +16,7 @@ async function main() {
   await db.comment.deleteMany();
   await db.activeVersion.deleteMany();
   await db.tag.deleteMany();
+  await db.testCase.deleteMany();
   await db.branch.deleteMany();
   await db.promptVersion.deleteMany();
   await db.prompt.deleteMany();
@@ -223,6 +224,39 @@ async function main() {
 
   console.log(`Создано ${created} промптов.`);
 
+  // Тест-кейсы для первых 5 промптов
+  console.log("Создание тест-кейсов...");
+  const tcData: Record<string, { name: string; inputs: Record<string, unknown> }[]> = {
+    "resume-screener": [
+      { name: "Senior Python — сильный", inputs: { candidate_name: "Анна Смирнова", job_title: "Senior Python Developer", grade: "Senior", location: "Москва", resume: "8 лет опыта. Python, FastAPI, Django, PostgreSQL, Docker, Kubernetes. Запускал сервисы с нагрузкой 10k RPS. Руководил командой из 5 человек. Спикер на PyCon Russia 2023.", requirements: ["Python 3.10+", "FastAPI или Django", "PostgreSQL", "Docker", "CI/CD"] } },
+      { name: "Junior Frontend — слабый", inputs: { candidate_name: "Иван Петров", job_title: "Frontend Developer", grade: "Junior", location: "Удалённо", resume: "1 год опыта. HTML, CSS, базовый JavaScript. Делал лендинги на Tilda. Без опыта с фреймворками.", requirements: ["React", "TypeScript", "REST API", "Git"] } },
+    ],
+    "cv-parser-extractor": [
+      { name: "Резюме разработчика", inputs: { resume: "Иван Иванов, Python разработчик, 5 лет опыта. Москва. Технологии: Python, Django, PostgreSQL, Redis, Docker. Образование: МГТУ им. Баумана, 2019. Последнее место: Яндекс, 2 года." } },
+      { name: "Резюме продакта", inputs: { resume: "Мария Сидорова, Product Manager, 3 года опыта. Запустила 2 продукта с нуля. Метрики: DAU +40%, retention +15%. Предыдущий опыт: СБЕР, Ozon." } },
+    ],
+    "structured-interview-questions": [
+      { name: "Middle Backend", inputs: { role: "Backend Developer", grade: "Middle", team: "Платёжный сервис", competencies: ["Системный дизайн", "Python", "Базы данных"], context: "Оценка на middle-грейд, фокус на проектирование и работу с БД" } },
+    ],
+    "interview-answer-grader": [
+      { name: "Системное мышление", inputs: { question: "Расскажите о самом сложном техническом решении, которое вы принимали", competency: "Системное мышление", grade: "Senior", answer: "Проектировал микросервисную архитектуру для обработки платежей. Разделил монолит на 4 сервиса, ввёл очереди Kafka, обеспечил idempotency через outbox pattern. Нагрузка выросла с 1k до 50k RPS без даунтайма." } },
+    ],
+    "behavioral-interview-script": [
+      { name: "Senior PM", inputs: { role: "Product Manager", grade: "Senior", team: "Core Product", competencies: ["Стратегия", "Приоритизация", "Data-driven"], duration: "60 минут", selling_points: "Гибкий график, опционы, сильная команда, продуктовые конференции" } },
+    ],
+  };
+
+  let tcCount = 0;
+  for (const [promptName, cases] of Object.entries(tcData)) {
+    const p = await db.prompt.findFirst({ where: { name: promptName, projectId: project.id } });
+    if (!p) continue;
+    for (const tc of cases) {
+      await db.testCase.create({ data: { promptId: p.id, name: tc.name, inputs: tc.inputs as any } });
+      tcCount++;
+    }
+  }
+  console.log(`Создано ${tcCount} тест-кейсов.`);
+
   // Создаём эксперименты для первых 8 кандидатов с variant
   console.log(`Создание A/B-экспериментов для ${Math.min(8, experimentCandidates.length)} промптов...`);
   function randn() {
@@ -336,6 +370,7 @@ async function main() {
     db.auditLog.count({ where: { projectId: project.id } }),
     db.provider.count(),
     db.model.count(),
+    db.testCase.count(),
   ]);
   console.log("=== Сводка ===");
   console.log(JSON.stringify({
@@ -349,6 +384,7 @@ async function main() {
     auditLogs: counts[7],
     providers: counts[8],
     models: counts[9],
+    testCases: counts[10],
   }, null, 2));
 }
 

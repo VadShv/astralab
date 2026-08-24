@@ -18,6 +18,7 @@ import {
   Activity,
   BookOpen,
   Settings,
+  FileCode2,
 } from "lucide-react";
 import { useNav, type ViewKey } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
@@ -35,12 +36,11 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 const NAV: { key: ViewKey; label: string; icon: React.ElementType; group: string; code: string }[] = [
+  { key: "ide", label: "IDE промптов", icon: FileCode2, group: "Рабочее пространство", code: "IDE-00" },
   { key: "overview", label: "Командный центр", icon: LayoutDashboard, group: "Навигация", code: "CMD-01" },
   { key: "library", label: "Библиотека HR-промптов", icon: Library, group: "Навигация", code: "LIB-02" },
   { key: "instructions", label: "Инструкция", icon: BookOpen, group: "Навигация", code: "DOC-09" },
   { key: "history", label: "Граф версий", icon: GitBranch, group: "Разработка", code: "DAG-03" },
-  { key: "editor", label: "Конструктор промптов", icon: Code2, group: "Разработка", code: "EDT-04" },
-  { key: "playground", label: "Тестовый стенд", icon: FlaskConical, group: "Разработка", code: "PLG-05" },
   { key: "experiments", label: "A/B эксперименты", icon: FlaskConical, group: "Исследование", code: "EXP-06" },
   { key: "deployment", label: "Карта развёртывания", icon: Rocket, group: "Релиз", code: "DEP-07" },
   { key: "audit", label: "Журнал аудита", icon: ScrollText, group: "Релиз", code: "AUD-08" },
@@ -293,7 +293,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
       <Button
         size="sm"
         className="h-9 gap-1.5 border-glow bg-primary/15 text-primary hover:bg-primary/25"
-        onClick={() => useNav.getState().navigate("library")}
+        onClick={() => useNav.getState().navigate("ide")}
       >
         <Plus className="h-4 w-4" />
         <span className="hidden sm:inline">Новый промпт</span>

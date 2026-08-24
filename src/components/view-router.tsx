@@ -12,10 +12,13 @@ import { ExperimentsView } from "@/components/views/experiments";
 import { DeploymentView } from "@/components/views/deployment";
 import { AuditView } from "@/components/views/audit";
 import { SettingsView } from "@/components/views/settings";
+import { IdeView } from "@/components/views/ide";
 
 export function ViewRouter() {
   const { view } = useNav();
   switch (view) {
+    case "ide":
+      return <IdeView />;
     case "overview":
       return <OverviewView />;
     case "library":
@@ -37,6 +40,6 @@ export function ViewRouter() {
     case "settings":
       return <SettingsView />;
     default:
-      return <OverviewView />;
+      return <IdeView />;
   }
 }
