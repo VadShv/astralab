@@ -50,6 +50,7 @@ import { cn } from "@/lib/utils";
 import { extractVariables, type PromptContent, type PromptVariable, type ModelConfig } from "@/lib/prompt";
 import { VersionPanel, type VersionItem } from "@/components/ide/version-panel";
 import { DiffViewer, type DiffVersion } from "@/components/ide/diff-viewer";
+import { BranchSelector } from "@/components/ide/branch-selector";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -153,6 +154,7 @@ export function IdeView() {
   const [modelId, setModelId] = React.useState<string>("");
   const [commitMsg, setCommitMsg] = React.useState("");
   const [showConfig, setShowConfig] = React.useState(false);
+  const [selectedBranch, setSelectedBranch] = React.useState("main");
 
   // --- inputs & test cases ---
   const [inputs, setInputs] = React.useState<Record<string, string>>({});
@@ -199,6 +201,31 @@ export function IdeView() {
     enabled: !!selectedPromptId,
   });
 
+  const { data: branchesData } = useQuery({
+    queryKey: ["branches", selectedPromptId],
+    queryFn: () => fetch(`/api/prompts/${selectedPromptId}/branches`).then((r) => r.json()),
+    enabled: !!selectedPromptId,
+  });
+  const branchNames: string[] = React.useMemo(() => {
+    const fromBranches = (branchesData?.branches ?? []).map((b: any) => b.name);
+    const fromVersions = (versionsData?.versions ?? []).map((v: any) => v.branch);
+    return [...new Set([...fromBranches, ...fromVersions])];
+  }, [branchesData, versionsData]);
+
+  const createBranchMut = useMutation({
+    mutationFn: (name: string) =>
+      fetch(`/api/prompts/${selectedPromptId}/branches`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      toast.success("Ветка создана");
+      qc.invalidateQueries({ queryKey: ["branches", selectedPromptId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Не удалось создать ветку"),
+  });
+
   React.useEffect(() => {
     if (tcData?.testCases) setTestCases(tcData.testCases);
   }, [tcData]);
@@ -212,6 +239,7 @@ export function IdeView() {
     setDeclaredVars(latest.variables ?? []);
     setModelConfig(latest.modelConfig ?? DEFAULT_CONFIG);
     setModelId(latest.model?.id ?? "");
+    setSelectedBranch(latest.branch ?? "main");
     setInputs({});
     setResults({});
     setActiveTcId(null);
@@ -226,6 +254,7 @@ export function IdeView() {
       setDeclaredVars(full.variables ?? []);
       setModelConfig(full.modelConfig ?? DEFAULT_CONFIG);
       setModelId(full.model?.id ?? "");
+      setSelectedBranch(full.branch ?? "main");
       setInputs({});
       setResults({});
     }
@@ -384,7 +413,7 @@ export function IdeView() {
       variables: declaredVars,
       modelConfig,
       modelId: modelId || undefined,
-      branch: "main",
+      branch: selectedBranch,
       commitMessage: commitMsg || `Iteration ${new Date().toLocaleString("ru-RU")}`,
       semverKind: "patch",
     });
@@ -485,6 +514,14 @@ export function IdeView() {
         </div>
         {selectedPrompt?.defaultModel && (
           <Badge variant="secondary" className="text-[10px]">{selectedPrompt.defaultModel.displayName}</Badge>
+        )}
+        {selectedPromptId && (
+          <BranchSelector
+            branches={branchNames}
+            selectedBranch={selectedBranch}
+            onSelect={setSelectedBranch}
+            onCreate={(name) => { createBranchMut.mutate(name); setSelectedBranch(name); }}
+          />
         )}
 
         <div className="ml-auto flex items-center gap-2">
