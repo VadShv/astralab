@@ -23,6 +23,7 @@ import {
   GitCommitHorizontal,
   FileDiff,
   GitCompare,
+  Sparkles,
   Clock,
   Trash2,
 } from "lucide-react";
@@ -55,6 +56,7 @@ import { DiffViewer, type DiffVersion } from "@/components/ide/diff-viewer";
 import { BranchSelector } from "@/components/ide/branch-selector";
 import { ModelCompareDialog } from "@/components/ide/model-compare";
 import { BatchEvalDialog } from "@/components/ide/batch-eval";
+import { OptimizeDialog } from "@/components/ide/optimize-panel";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -120,6 +122,9 @@ export function IdeView() {
 
   // --- batch eval ---
   const [batchEvalOpen, setBatchEvalOpen] = React.useState(false);
+
+  // --- optimize ---
+  const [optimizeOpen, setOptimizeOpen] = React.useState(false);
 
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
@@ -579,10 +584,15 @@ export function IdeView() {
             <div className="space-y-4">
               {/* System */}
               <div>
-                <Label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium">
-                  <span className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] text-primary">SYSTEM</span>
-                  Системное сообщение
-                </Label>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <Label className="flex items-center gap-1.5 text-xs font-medium">
+                    <span className="rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] text-primary">SYSTEM</span>
+                    Системное сообщение
+                  </Label>
+                  <Button variant="ghost" size="sm" className="h-6 text-[11px] text-primary" onClick={() => setOptimizeOpen(true)} disabled={!content.system && !content.user}>
+                    <Sparkles className="mr-1 h-3 w-3" /> Улучшить
+                  </Button>
+                </div>
                 <Textarea
                   className="min-h-[120px] resize-y font-mono text-xs leading-relaxed"
                   placeholder="You are an expert HR recruiter..."
@@ -833,6 +843,16 @@ export function IdeView() {
         variables={declaredVars}
         modelConfig={modelConfig}
         modelId={modelId}
+      />
+
+      {/* AI optimize */}
+      <OptimizeDialog
+        open={optimizeOpen}
+        onOpenChange={setOptimizeOpen}
+        content={content}
+        variables={declaredVars}
+        sampleOutput={results["custom"]?.output || Object.values(results)[0]?.output}
+        onApply={(system, user) => setContent({ system, user })}
       />
     </div>
   );
