@@ -82,12 +82,31 @@ export async function listRemoteModels(
   apiKey: string
 ): Promise<{ id: string }[]> {
   const url = `${baseUrl.replace(/\/$/, "")}/models`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch (e: any) {
+    throw new Error(
+      `Не удалось подключиться к ${url}. Проверьте baseUrl и сетевую доступность (${e?.message ?? "network error"}).`
+    );
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`List models failed (${res.status}): ${text.slice(0, 500)}`);
+    const ct = res.headers.get("content-type") ?? "";
+    const isHtml = ct.includes("text/html") || /^\s*(<!doctype|<html)/i.test(text);
+    if (isHtml) {
+      throw new Error(
+        `baseUrl вернул HTML-страницу (HTTP ${res.status}), а не API. Скорее всего, вы указали адрес веб-приложения, а не OpenAI-совместимый endpoint провайдера. Пример правильного baseUrl: https://api.cloud.ru/v1`
+      );
+    }
+    if (res.status === 404) {
+      throw new Error(
+        `endpoint /models не найден (404). Проверьте, что baseUrl указывает на корень API нужной версии (например, https://api.cloud.ru/v1), а не на сайт или приложение.`
+      );
+    }
+    throw new Error(`List models failed (${res.status}): ${text.slice(0, 300)}`);
   }
   const data = await res.json();
   return (data.data ?? data.models ?? []) as { id: string }[];
