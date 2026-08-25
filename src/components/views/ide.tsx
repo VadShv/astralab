@@ -57,6 +57,7 @@ import { BranchSelector } from "@/components/ide/branch-selector";
 import { ModelCompareDialog } from "@/components/ide/model-compare";
 import { BatchEvalDialog } from "@/components/ide/batch-eval";
 import { OptimizeDialog } from "@/components/ide/optimize-panel";
+import { ExperimentLauncher } from "@/components/ide/experiment-launcher";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -125,6 +126,9 @@ export function IdeView() {
 
   // --- optimize ---
   const [optimizeOpen, setOptimizeOpen] = React.useState(false);
+
+  // --- experiment launcher ---
+  const [expLaunchOpen, setExpLaunchOpen] = React.useState(false);
 
   // --- results ---
   const [results, setResults] = React.useState<Record<string, RunResult>>({});
@@ -528,6 +532,9 @@ export function IdeView() {
           <Button size="sm" variant="outline" onClick={() => setBatchEvalOpen(true)} disabled={!selectedPromptId || testCases.length === 0}>
             <FlaskConical className="mr-1.5 h-4 w-4" /> Батч
           </Button>
+          <Button size="sm" variant="outline" onClick={() => setExpLaunchOpen(true)} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2}>
+            <FlaskConical className="mr-1.5 h-4 w-4" /> A/B
+          </Button>
         </div>
       </div>
 
@@ -853,6 +860,19 @@ export function IdeView() {
         variables={declaredVars}
         sampleOutput={results["custom"]?.output || Object.values(results)[0]?.output}
         onApply={(system, user) => setContent({ system, user })}
+      />
+
+      {/* Experiment launcher */}
+      <ExperimentLauncher
+        open={expLaunchOpen}
+        onOpenChange={setExpLaunchOpen}
+        promptId={selectedPromptId}
+        versions={(versionsData?.versions ?? []).map((v: any) => ({
+          id: v.id,
+          semver: v.semver,
+          branch: v.branch,
+          commitMessage: v.commitMessage,
+        }))}
       />
     </div>
   );
