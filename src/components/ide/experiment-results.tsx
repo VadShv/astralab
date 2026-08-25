@@ -23,11 +23,13 @@ import {
   TrendingDown,
   Loader2,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge } from "@/components/views/shared";
+import { ExperimentSimulator } from "./experiment-simulator";
 import { useNav } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +39,7 @@ export function ExperimentResults({ promptId }: { promptId: string | null }) {
   const { navigate } = useNav();
   const qc = useQueryClient();
   const [selectedExp, setSelectedExp] = React.useState<string | null>(null);
+  const [simOpen, setSimOpen] = React.useState(false);
 
   const { data: expData } = useQuery({
     queryKey: ["ide-experiments", promptId],
@@ -153,6 +156,17 @@ export function ExperimentResults({ promptId }: { promptId: string | null }) {
               <p className="mt-0.5 line-clamp-1 text-[10px] text-muted-foreground">{exp.hypothesis}</p>
             </div>
             <div className="flex shrink-0 gap-1">
+              {(exp.status === "running" || exp.status === "paused") && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-[10px]"
+                  onClick={() => setSimOpen(true)}
+                  title="Симулировать трафик"
+                >
+                  <Sparkles className="mr-1 h-3 w-3" /> Симулировать
+                </Button>
+              )}
               {exp.status === "running" && (
                 <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => statusMut.mutate({ id: selectedExp!, status: "paused" })}>
                   <Pause className="h-3.5 w-3.5" />
@@ -282,6 +296,16 @@ export function ExperimentResults({ promptId }: { promptId: string | null }) {
           </div>
         </div>
       )}
+
+      <ExperimentSimulator
+        open={simOpen}
+        onOpenChange={setSimOpen}
+        experimentId={selectedExp}
+        onGenerated={() => {
+          qc.invalidateQueries({ queryKey: ["experiment-results", selectedExp] });
+          qc.invalidateQueries({ queryKey: ["ide-experiments", promptId] });
+        }}
+      />
     </div>
   );
 }
