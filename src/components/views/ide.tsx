@@ -58,6 +58,7 @@ import { ModelCompareDialog } from "@/components/ide/model-compare";
 import { BatchEvalDialog } from "@/components/ide/batch-eval";
 import { OptimizeDialog } from "@/components/ide/optimize-panel";
 import { ExperimentLauncher } from "@/components/ide/experiment-launcher";
+import { ExperimentResults } from "@/components/ide/experiment-results";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.3, top_p: 0.9, max_tokens: 1200 };
 
@@ -111,7 +112,7 @@ export function IdeView() {
   const [activeTcId, setActiveTcId] = React.useState<string | null>(null);
 
   // --- right panel tabs ---
-  const [rightTab, setRightTab] = React.useState<"output" | "versions">("output");
+  const [rightTab, setRightTab] = React.useState<"output" | "versions" | "experiments">("output");
 
   // --- diff viewer ---
   const [diffOpen, setDiffOpen] = React.useState(false);
@@ -746,6 +747,15 @@ export function IdeView() {
                 <span className="rounded bg-primary/10 px-1 text-[10px]">{versionsData?.versions?.length}</span>
               )}
             </button>
+            <button
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors",
+                rightTab === "experiments" ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => setRightTab("experiments")}
+            >
+              <FlaskConical className="h-3.5 w-3.5" /> A/B
+            </button>
           </div>
 
           {/* Tab content */}
@@ -769,7 +779,7 @@ export function IdeView() {
                 </div>
               )}
             </div>
-          ) : (
+          ) : rightTab === "versions" ? (
             <VersionPanel
               versions={(versionsData?.versions ?? []).map((v: any) => ({
                 id: v.id,
@@ -786,6 +796,8 @@ export function IdeView() {
               onSelectVersion={selectVersion}
               onCompare={openDiff}
             />
+          ) : (
+            <ExperimentResults promptId={selectedPromptId} />
           )}
         </div>
       </div>
