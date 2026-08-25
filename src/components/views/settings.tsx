@@ -468,11 +468,11 @@ function ProviderDialog({
               id="p-url"
               value={baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="https://api.cloud.ru/v1"
+              placeholder="https://foundation-models.api.cloud.ru/v1"
               className="font-mono text-sm"
             />
             <p className="text-[10px] text-muted-foreground">
-              URL OpenAI-совместимого API провайдера (с версией, например /v1). Не адрес этого приложения.
+              URL OpenAI-совместимого API провайдера (с версией, например /v1). Для Cloud.ru: https://foundation-models.api.cloud.ru/v1
             </p>
           </div>
           <div className="space-y-1.5">

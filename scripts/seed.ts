@@ -52,7 +52,7 @@ async function main() {
 
   console.log("Создание провайдера и модели по умолчанию...");
   const providerName = process.env.DEFAULT_PROVIDER_NAME || "Cloud.ru";
-  const providerUrl = process.env.DEFAULT_PROVIDER_BASE_URL || "https://api.cloud.ru/v1";
+  const providerUrl = process.env.DEFAULT_PROVIDER_BASE_URL || "https://foundation-models.api.cloud.ru/v1";
   const providerKey = process.env.DEFAULT_PROVIDER_API_KEY || "placeholder-key";
   const { enc, iv } = encrypt(providerKey);
   const provider = await db.provider.create({

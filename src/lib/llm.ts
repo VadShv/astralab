@@ -98,12 +98,12 @@ export async function listRemoteModels(
     const isHtml = ct.includes("text/html") || /^\s*(<!doctype|<html)/i.test(text);
     if (isHtml) {
       throw new Error(
-        `baseUrl вернул HTML-страницу (HTTP ${res.status}), а не API. Скорее всего, вы указали адрес веб-приложения, а не OpenAI-совместимый endpoint провайдера. Пример правильного baseUrl: https://api.cloud.ru/v1`
+        `baseUrl вернул HTML-страницу (HTTP ${res.status}), а не JSON API. Возможные причины: (1) baseUrl указывает на сайт/приложение, а не на API провайдера; (2) неверный baseUrl — провайдер перенаправил на маркетинг. Для Cloud.ru используйте: https://foundation-models.api.cloud.ru/v1`
       );
     }
     if (res.status === 404) {
       throw new Error(
-        `endpoint /models не найден (404). Проверьте, что baseUrl указывает на корень API нужной версии (например, https://api.cloud.ru/v1), а не на сайт или приложение.`
+        `endpoint /models не найден (404). Проверьте, что baseUrl указывает на корень API нужной версии (например, https://foundation-models.api.cloud.ru/v1), а не на сайт или приложение.`
       );
     }
     throw new Error(`List models failed (${res.status}): ${text.slice(0, 300)}`);
