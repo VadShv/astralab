@@ -274,6 +274,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json({
     experiment: {
       id: experiment.id,
+      promptId: experiment.promptId,
       name: experiment.name,
       hypothesis: experiment.hypothesis,
       status: experiment.status,

@@ -15,6 +15,7 @@ import {
   GitFork,
   ArrowLeft,
   Check,
+  FlaskConical,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -150,6 +151,9 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate("experiments", { promptId })}>
+            <FlaskConical className="mr-1.5 h-4 w-4" /> A/B тест
+          </Button>
           {isReadOnly ? (
             <>
               <Button variant="outline" size="sm" onClick={() => navigate("playground", { promptId, versionId })}>

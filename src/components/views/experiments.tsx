@@ -29,6 +29,8 @@ import {
   ArrowLeft,
   Target,
   Gauge,
+  GitBranch,
+  FileCode2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,16 +58,19 @@ export function ExperimentsView() {
 }
 
 function ExperimentsList() {
-  const { navigate } = useNav();
+  const { navigate, promptId: navPromptId } = useNav();
   const { data: promptsData } = useQuery({
     queryKey: ["prompts"],
     queryFn: () => fetch("/api/prompts").then((r) => r.json()),
   });
   const [selectedPrompt, setSelectedPrompt] = React.useState<string | null>(null);
   React.useEffect(() => {
-    if (!selectedPrompt && promptsData?.prompts?.length)
-      setSelectedPrompt(promptsData.prompts[0].id);
-  }, [promptsData, selectedPrompt]);
+    if (selectedPrompt) return;
+    const list = promptsData?.prompts ?? [];
+    if (!list.length) return;
+    const initial = navPromptId && list.some((p: any) => p.id === navPromptId) ? navPromptId : list[0].id;
+    setSelectedPrompt(initial);
+  }, [promptsData, navPromptId, selectedPrompt]);
 
   const { data: expData } = useQuery({
     queryKey: ["prompt-experiments", selectedPrompt],
@@ -83,9 +88,21 @@ function ExperimentsList() {
           <h2 className="text-lg font-semibold tracking-tight">Эксперименты</h2>
           <p className="text-sm text-muted-foreground">Статистически обеспеченные A/B-тесты на живом трафике</p>
         </div>
-        <Button size="sm" onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-1.5 h-4 w-4" /> Новый эксперимент
-        </Button>
+        <div className="flex gap-2">
+          {selectedPrompt && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => navigate("history", { promptId: selectedPrompt })}>
+                <GitBranch className="mr-1.5 h-4 w-4" /> Граф версий
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("ide", { promptId: selectedPrompt })}>
+                <FileCode2 className="mr-1.5 h-4 w-4" /> IDE
+              </Button>
+            </>
+          )}
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-1.5 h-4 w-4" /> Новый эксперимент
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -211,6 +228,16 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
           </div>
         </div>
         <div className="flex gap-2">
+          {exp.promptId && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => navigate("history", { promptId: exp.promptId })}>
+                <GitBranch className="mr-1.5 h-4 w-4" /> Граф версий
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate("ide", { promptId: exp.promptId })}>
+                <FileCode2 className="mr-1.5 h-4 w-4" /> IDE
+              </Button>
+            </>
+          )}
           {exp.status === "running" ? (
             <Button variant="outline" size="sm" onClick={() => statusMut.mutate("paused")}>
               <Pause className="mr-1.5 h-4 w-4" /> Пауза
