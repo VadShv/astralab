@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Code2,
   Rocket,
+  FileCode2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -112,6 +113,9 @@ function HistoryInner({ promptId }: { promptId: string }) {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate("ide", { promptId })}>
+            <FileCode2 className="mr-1.5 h-4 w-4" /> IDE
+          </Button>
           <Button variant="outline" size="sm" onClick={() => navigate("playground", { promptId })}>
             <Code2 className="mr-1.5 h-4 w-4" /> Песочница
           </Button>

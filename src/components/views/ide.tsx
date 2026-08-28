@@ -23,6 +23,8 @@ import {
   GitCommitHorizontal,
   FileDiff,
   GitCompare,
+  GitBranch,
+  Rocket,
   Sparkles,
   Clock,
   Trash2,
@@ -69,7 +71,7 @@ interface TestCase {
 }
 
 export function IdeView() {
-  const { navigate } = useNav();
+  const { navigate, promptId: selectedPromptId, versionId: selectedVersionId, setContext } = useNav();
   const qc = useQueryClient();
 
   // --- queries ---
@@ -91,9 +93,7 @@ export function IdeView() {
   });
   const hasActiveProvider = (providersData?.providers ?? []).some((p: any) => p.isActive);
 
-  // --- selection ---
-  const [selectedPromptId, setSelectedPromptId] = React.useState<string | null>(null);
-  const [selectedVersionId, setSelectedVersionId] = React.useState<string | null>(null);
+  // --- selection: promptId/versionId live in nav-store so every view stays in sync ---
   const [libraryOpen, setLibraryOpen] = React.useState(true);
   const [search, setSearch] = React.useState("");
 
@@ -195,13 +195,14 @@ export function IdeView() {
   React.useEffect(() => {
     const versions = versionsData?.versions ?? [];
     if (versions.length === 0) return;
-    const latest = versions[versions.length - 1];
-    setSelectedVersionId(latest.id);
-    setContent(latest.content ?? { system: "", user: "" });
-    setDeclaredVars(latest.variables ?? []);
-    setModelConfig(latest.modelConfig ?? DEFAULT_CONFIG);
-    setModelId(latest.model?.id ?? "");
-    setSelectedBranch(latest.branch ?? "main");
+    const existing = selectedVersionId ? versions.find((v: any) => v.id === selectedVersionId) : null;
+    const target = existing ?? versions[versions.length - 1];
+    if (!existing) setContext({ versionId: target.id });
+    setContent(target.content ?? { system: "", user: "" });
+    setDeclaredVars(target.variables ?? []);
+    setModelConfig(target.modelConfig ?? DEFAULT_CONFIG);
+    setModelId(target.model?.id ?? "");
+    setSelectedBranch(target.branch ?? "main");
     setInputs({});
     setResults({});
     setActiveTcId(null);
@@ -209,7 +210,7 @@ export function IdeView() {
 
   // --- load a specific version into the editor ---
   const selectVersion = (v: VersionItem) => {
-    setSelectedVersionId(v.id);
+    setContext({ versionId: v.id });
     const full = (versionsData?.versions ?? []).find((x: any) => x.id === v.id);
     if (full) {
       setContent(full.content ?? { system: "", user: "" });
@@ -259,7 +260,7 @@ export function IdeView() {
   };
 
   const applyDiffVersion = (v: DiffVersion) => {
-    setSelectedVersionId(v.id);
+    setContext({ versionId: v.id });
     setContent(v.content);
     setDeclaredVars(v.variables);
     setModelConfig(v.modelConfig);
@@ -422,7 +423,7 @@ export function IdeView() {
     onSuccess: (data) => {
       toast.success("Промпт создан");
       qc.invalidateQueries({ queryKey: ["prompts"] });
-      setSelectedPromptId(data.prompt.id);
+      setContext({ promptId: data.prompt.id, versionId: null });
       setContent({ system: "", user: "" });
       setDeclaredVars([]);
       setModelConfig(DEFAULT_CONFIG);
@@ -484,6 +485,20 @@ export function IdeView() {
             onSelect={setSelectedBranch}
             onCreate={(name) => { createBranchMut.mutate(name); setSelectedBranch(name); }}
           />
+        )}
+
+        {selectedPromptId && (
+          <div className="flex items-center gap-0.5 rounded-md border border-primary/10 bg-primary/5 px-1 py-0.5">
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Граф версий" onClick={() => navigate("history", { promptId: selectedPromptId })}>
+              <GitBranch className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Песочница" onClick={() => navigate("playground", { promptId: selectedPromptId, versionId: selectedVersionId })}>
+              <Play className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="sm" className="h-7 w-7 p-0" title="Карта развёртывания" onClick={() => navigate("deployment") }>
+              <Rocket className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         )}
 
         <div className="ml-auto flex items-center gap-2">
@@ -571,7 +586,7 @@ export function IdeView() {
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-muted-foreground hover:bg-muted/50"
                   )}
-                  onClick={() => setSelectedPromptId(p.id)}
+                  onClick={() => setContext({ promptId: p.id, versionId: null })}
                 >
                   <FileText className="h-3 w-3 shrink-0" />
                   <span className="truncate">{p.name}</span>
