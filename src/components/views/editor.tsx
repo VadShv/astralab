@@ -34,6 +34,14 @@ import type { PromptContent, PromptVariable, ModelConfig } from "@/lib/prompt";
 
 const DEFAULT_CONFIG: ModelConfig = { temperature: 0.2, top_p: 0.9, max_tokens: 800 };
 
+const VERSION_STATUSES: { value: "draft" | "review" | "active" | "deprecated" | "rejected"; label: string }[] = [
+  { value: "draft", label: "Черновик" },
+  { value: "review", label: "На ревью" },
+  { value: "active", label: "Активна" },
+  { value: "deprecated", label: "В архиве" },
+  { value: "rejected", label: "Отклонена" },
+];
+
 export function EditorView() {
   const { promptId, versionId, navigate } = useNav();
 
@@ -118,6 +126,22 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
     onError: (e: any) => toast.error(e.message ?? "Не удалось закоммитить"),
   });
 
+  const statusMut = useMutation({
+    mutationFn: (status: string) =>
+      fetch(`/api/prompts/${promptId}/versions/${versionId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      }).then((r) => r.json()),
+    onSuccess: (_d, status) => {
+      toast.success(`Статус изменён: ${VERSION_STATUSES.find((s) => s.value === status)?.label ?? status}`);
+      qc.invalidateQueries({ queryKey: ["version", versionId] });
+      qc.invalidateQueries({ queryKey: ["versions", promptId] });
+      qc.invalidateQueries({ queryKey: ["overview"] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Не удалось сменить статус"),
+  });
+
   const fork = () => {
     setReadOnly(false);
     setVersionIdLocal(null);
@@ -151,6 +175,16 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
           </div>
         </div>
         <div className="flex gap-2">
+          {version && (
+            <Select value={version.status} onValueChange={(v) => statusMut.mutate(v)}>
+              <SelectTrigger className="h-8 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {VERSION_STATUSES.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           <Button variant="outline" size="sm" onClick={() => navigate("experiments", { promptId })}>
             <FlaskConical className="mr-1.5 h-4 w-4" /> A/B тест
           </Button>
