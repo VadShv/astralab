@@ -19,6 +19,7 @@ import {
   BookOpen,
   Settings,
   FileCode2,
+  Play,
 } from "lucide-react";
 import { useNav, type ViewKey } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
@@ -41,7 +42,9 @@ const NAV: { key: ViewKey; label: string; icon: React.ElementType; group: string
   { key: "library", label: "Библиотека HR-промптов", icon: Library, group: "Навигация", code: "LIB-02" },
   { key: "instructions", label: "Инструкция", icon: BookOpen, group: "Навигация", code: "DOC-09" },
   { key: "history", label: "Граф версий", icon: GitBranch, group: "Разработка", code: "DAG-03" },
+  { key: "editor", label: "Редактор версий", icon: Code2, group: "Разработка", code: "EDT-04" },
   { key: "experiments", label: "A/B эксперименты", icon: FlaskConical, group: "Исследование", code: "EXP-06" },
+  { key: "playground", label: "Песочница", icon: Play, group: "Исследование", code: "PG-05" },
   { key: "deployment", label: "Карта развёртывания", icon: Rocket, group: "Релиз", code: "DEP-07" },
   { key: "audit", label: "Журнал аудита", icon: ScrollText, group: "Релиз", code: "AUD-08" },
   { key: "settings", label: "Настройки", icon: Settings, group: "Релиз", code: "SET-10" },

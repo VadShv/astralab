@@ -10,7 +10,7 @@ import {
   FlaskConical,
   Rocket,
   Tag as TagIcon,
-  FileCode2,
+  Code2,
 } from "lucide-react";
 import { Panel, StatusBadge, EmptyState } from "./shared";
 import { Card } from "@/components/ui/card";
@@ -34,7 +34,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNav } from "@/lib/nav-store";
-import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -123,7 +122,13 @@ export function LibraryView() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {prompts.map((p: any) => (
-            <PromptCard key={p.id} prompt={p} onOpen={() => navigate("history", { promptId: p.id })} onOpenIde={() => navigate("ide", { promptId: p.id })} />
+            <PromptCard
+              key={p.id}
+              prompt={p}
+              onOpen={() => navigate("ide", { promptId: p.id })}
+              onOpenHistory={() => navigate("history", { promptId: p.id })}
+              onOpenPlayground={() => navigate("playground", { promptId: p.id })}
+            />
           ))}
         </div>
       )}
@@ -131,7 +136,7 @@ export function LibraryView() {
   );
 }
 
-function PromptCard({ prompt, onOpen, onOpenIde }: { prompt: any; onOpen: () => void; onOpenIde: () => void }) {
+function PromptCard({ prompt, onOpen, onOpenHistory, onOpenPlayground }: { prompt: any; onOpen: () => void; onOpenHistory: () => void; onOpenPlayground: () => void }) {
   const envs = prompt.environments ?? [];
   const prod = envs.find((e: any) => e.environment === "production");
   return (
@@ -169,15 +174,21 @@ function PromptCard({ prompt, onOpen, onOpenIde }: { prompt: any; onOpen: () => 
 
       <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>{prompt.defaultModel?.displayName ?? "—"}</span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             className="inline-flex items-center gap-1 rounded-md border border-primary/20 bg-primary/5 px-1.5 py-0.5 font-medium text-primary hover:bg-primary/10"
-            onClick={(e) => { e.stopPropagation(); onOpenIde(); }}
-            title="Открыть в IDE"
+            onClick={(e) => { e.stopPropagation(); onOpenHistory(); }}
+            title="Граф версий"
           >
-            <FileCode2 className="h-3 w-3" /> IDE
+            <GitBranch className="h-3 w-3" /> Граф
           </button>
-          <span>обновлён {timeAgo(prompt.createdAt)}</span>
+          <button
+            className="inline-flex items-center gap-1 rounded-md border border-primary/20 bg-primary/5 px-1.5 py-0.5 font-medium text-primary hover:bg-primary/10"
+            onClick={(e) => { e.stopPropagation(); onOpenPlayground(); }}
+            title="Песочница"
+          >
+            <Code2 className="h-3 w-3" /> Песочница
+          </button>
         </div>
       </div>
     </Card>
