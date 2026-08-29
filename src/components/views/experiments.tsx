@@ -188,7 +188,9 @@ function ExperimentDashboard({ experimentId }: { experimentId: string }) {
         body: JSON.stringify({}),
       }).then((r) => r.json()),
     onSuccess: (d) => {
-      toast.success(`Продвинут ${d.promoted.variant} → ${d.promoted.environment}`);
+      toast.success(`Продвинут ${d.promoted.variant} → ${d.promoted.environment}`, {
+        action: { label: "Развёртывание", onClick: () => navigate("deployment") },
+      });
       qc.invalidateQueries({ queryKey: ["experiment-results", experimentId] });
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });

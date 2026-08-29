@@ -128,7 +128,7 @@ export async function POST(
     action: "version.created",
     targetType: "prompt_version",
     targetId: version.id,
-    detail: { semver: finalSemver, branch, commitMessage },
+    detail: { promptId, semver: finalSemver, branch, commitMessage },
   });
 
   return NextResponse.json({ version }, { status: 201 });

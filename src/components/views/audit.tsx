@@ -2,12 +2,22 @@
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ScrollText, Filter } from "lucide-react";
+import { ScrollText, Filter, ArrowUpRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { timeAgo, fmtDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { useNav, type ViewKey } from "@/lib/nav-store";
+
+/** Resolve a clickable navigation target for an audit entry, or null. */
+function auditTarget(log: any): { view: ViewKey; params: Record<string, string | null> } | null {
+  if (log.targetType === "prompt") return { view: "history", params: { promptId: log.targetId } };
+  if (log.targetType === "prompt_version" && log.detail?.promptId)
+    return { view: "history", params: { promptId: log.detail.promptId } };
+  if (log.targetType === "experiment") return { view: "experiments", params: { experimentId: log.targetId } };
+  return null;
+}
 
 const ACTION_FILTERS = [
   "all",
@@ -22,6 +32,7 @@ const ACTION_FILTERS = [
 ];
 
 export function AuditView() {
+  const { navigate } = useNav();
   const [filter, setFilter] = React.useState("all");
   const { data } = useQuery({
     queryKey: ["audit", filter],
@@ -62,8 +73,17 @@ export function AuditView() {
           {logs.length === 0 && (
             <div className="py-12 text-center text-sm text-muted-foreground">Нет подходящих событий.</div>
           )}
-          {logs.map((log) => (
-            <div key={log.id} className="flex items-start gap-3 px-4 py-3 hover:bg-muted/30">
+          {logs.map((log) => {
+            const target = auditTarget(log);
+            return (
+            <div
+              key={log.id}
+              className={cn(
+                "flex items-start gap-3 px-4 py-3 hover:bg-muted/30",
+                target && "cursor-pointer"
+              )}
+              onClick={target ? () => navigate(target.view, target.params) : undefined}
+            >
               <Avatar className="h-7 w-7 shrink-0">
                 <AvatarFallback style={{ background: log.actor?.avatarColor ?? "#71717a" }} className="text-[10px] text-white">
                   {log.actor?.name?.slice(0, 2) ?? "SY"}
@@ -76,6 +96,7 @@ export function AuditView() {
                     {log.action}
                   </span>
                   <span className="text-xs text-muted-foreground">{log.targetType}</span>
+                  {target && <ArrowUpRight className="h-3 w-3 text-primary" />}
                 </div>
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
                   <span>{fmtDateTime(log.createdAt)}</span>
@@ -91,7 +112,8 @@ export function AuditView() {
               </div>
               <span className={cn("mt-0.5 h-2 w-2 shrink-0 rounded-full", tone(log.action))} />
             </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
     </div>

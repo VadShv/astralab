@@ -84,7 +84,9 @@ export function ExperimentResults({ promptId }: { promptId: string | null }) {
         body: JSON.stringify({}),
       }).then((r) => r.json()),
     onSuccess: (d) => {
-      toast.success(`Победитель продвинут: ${d.promoted?.variant}`);
+      toast.success(`Победитель продвинут: ${d.promoted?.variant}`, {
+        action: { label: "Развёртывание", onClick: () => navigate("deployment") },
+      });
       qc.invalidateQueries({ queryKey: ["experiment-results", selectedExp] });
       qc.invalidateQueries({ queryKey: ["deployment"] });
     },

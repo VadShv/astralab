@@ -22,7 +22,7 @@ export async function PATCH(
     action: "version.status_changed",
     targetType: "prompt_version",
     targetId: vid,
-    detail: { status, semver: updated.semver },
+    detail: { promptId, status, semver: updated.semver },
   });
 
   return NextResponse.json({ version: updated });

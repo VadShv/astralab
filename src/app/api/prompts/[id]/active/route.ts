@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     action: "version.activated",
     targetType: "prompt_version",
     targetId: versionId,
-    detail: { environment, semver: version?.semver },
+    detail: { promptId, environment, semver: version?.semver },
   });
 
   return NextResponse.json({ active });

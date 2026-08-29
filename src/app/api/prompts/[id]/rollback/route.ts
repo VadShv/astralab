@@ -46,6 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     targetType: "prompt_version",
     targetId: targetId,
     detail: {
+      promptId: prompt.id,
       environment,
       fromSemver: current?.version?.semver,
       toSemver: target?.semver,

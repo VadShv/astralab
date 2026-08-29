@@ -117,7 +117,9 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
       if (data.reused) {
         toast.info("Идентичное содержимое — использована существующая версия");
       } else {
-        toast.success(`Закоммичено ${data.version?.semver}`);
+        toast.success(`Закоммичено ${data.version?.semver}`, {
+          action: { label: "Аудит", onClick: () => navigate("audit") },
+        });
       }
       qc.invalidateQueries({ queryKey: ["versions", promptId] });
       qc.invalidateQueries({ queryKey: ["overview"] });
@@ -134,7 +136,9 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
         body: JSON.stringify({ status }),
       }).then((r) => r.json()),
     onSuccess: (_d, status) => {
-      toast.success(`Статус изменён: ${VERSION_STATUSES.find((s) => s.value === status)?.label ?? status}`);
+      toast.success(`Статус изменён: ${VERSION_STATUSES.find((s) => s.value === status)?.label ?? status}`, {
+        action: { label: "Аудит", onClick: () => navigate("audit") },
+      });
       qc.invalidateQueries({ queryKey: ["version", versionId] });
       qc.invalidateQueries({ queryKey: ["versions", promptId] });
       qc.invalidateQueries({ queryKey: ["overview"] });

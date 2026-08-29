@@ -54,7 +54,9 @@ export function DeploymentView() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
-      toast.success("Версия продвинута");
+      toast.success("Версия продвинута", {
+        action: { label: "Аудит", onClick: () => navigate("audit") },
+      });
     },
   });
 
@@ -68,7 +70,9 @@ export function DeploymentView() {
     onSuccess: (d) => {
       qc.invalidateQueries({ queryKey: ["deployment"] });
       qc.invalidateQueries({ queryKey: ["overview"] });
-      toast.success(`Откат к ${d.rolledBackTo?.semver}`);
+      toast.success(`Откат к ${d.rolledBackTo?.semver}`, {
+        action: { label: "Аудит", onClick: () => navigate("audit") },
+      });
     },
   });
 
