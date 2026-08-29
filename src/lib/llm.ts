@@ -62,7 +62,8 @@ export async function chatCompletion(params: ChatCompletionParams): Promise<Chat
     throw new Error(`LLM request failed (${res.status}): ${text.slice(0, 500)}`);
   }
   const data = await res.json();
-  const output = data.choices?.[0]?.message?.content ?? "";
+  const msg = data.choices?.[0]?.message;
+  const output = msg?.content ?? msg?.reasoning_content ?? msg?.reasoning ?? "";
   const usage = data.usage;
   return {
     output,
@@ -166,7 +167,8 @@ export async function* chatCompletionStream(
   const contentType = res.headers.get("content-type") ?? "";
   if (!contentType.includes("text/event-stream") || !res.body) {
     const data = await res.json();
-    const output = data.choices?.[0]?.message?.content ?? "";
+    const msg = data.choices?.[0]?.message;
+    const output = msg?.content ?? msg?.reasoning_content ?? msg?.reasoning ?? "";
     const usage = data.usage;
     if (output) yield { token: output };
     yield {
@@ -204,7 +206,8 @@ export async function* chatCompletionStream(
         }
         try {
           const json = JSON.parse(payload);
-          const delta = json.choices?.[0]?.delta?.content;
+          const d = json.choices?.[0]?.delta;
+          const delta = d?.content ?? d?.reasoning_content ?? d?.reasoning;
           if (delta) yield { token: delta };
           if (json.usage) {
             finalUsage = {
