@@ -43,7 +43,12 @@ export async function POST(req: NextRequest) {
     modelConfig = body.modelConfig ?? { temperature: 0.2, top_p: 0.9, max_tokens: 800 };
   }
 
-  const resolvedModelId = body.modelId ?? versionModelId ?? promptModelId;
+  // resolve model: run override > version override > prompt default > system default
+  let resolvedModelId = body.modelId ?? versionModelId ?? promptModelId;
+  if (!resolvedModelId) {
+    const fallback = await db.model.findFirst({ where: { isDefault: true } });
+    if (fallback) resolvedModelId = fallback.id;
+  }
   if (!resolvedModelId) {
     return new Response(
       JSON.stringify({ error: "No model configured. Set a default model for the prompt or pass modelId." }),
