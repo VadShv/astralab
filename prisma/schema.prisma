@@ -9,17 +9,23 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  name        String
-  avatarColor String   @default("#10b981")
-  role        String   @default("admin") // viewer | developer | reviewer | admin
-  createdAt   DateTime @default(now())
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  avatarColor   String   @default("#10b981")
+  role          String   @default("admin") // viewer | developer | reviewer | admin
+  passwordHash  String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime @default(now())
 
-  versions  PromptVersion[] @relation("VersionAuthor")
-  audits    AuditLog[]      @relation("AuditActor")
-  comments  Comment[]       @relation("CommentAuthor")
-  activated ActiveVersion[] @relation("Activator")
+  accounts     Account[]
+  sessions     Session[]
+  memberships  Membership[]
+  versions     PromptVersion[] @relation("VersionAuthor")
+  audits       AuditLog[]      @relation("AuditActor")
+  comments     Comment[]       @relation("CommentAuthor")
+  activated    ActiveVersion[] @relation("Activator")
 }
 
 model Organization {
@@ -32,7 +38,8 @@ model Organization {
   judgeModelId String?
   judgeModel   Model?   @relation("OrgJudgeModel", fields: [judgeModelId], references: [id], onDelete: SetNull)
 
-  projects Project[]
+  projects    Project[]
+  memberships Membership[]
 }
 
 model Project {
@@ -274,9 +281,60 @@ model EvalRun {
   avgScore   Float
   totalCount Int
   results    Json     // [{ testCaseId, testCaseName, output, score, reason, tokens, latencyMs }]
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
 
   @@index([promptId])
+}
+
+// ── next-auth models ──
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── multi-tenancy: user ↔ organization membership ──
+model Membership {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String   @default("admin") // admin | developer | reviewer | viewer
+  joinedAt       DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
 }

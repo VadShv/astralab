@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useNav, type ViewKey } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -222,6 +223,14 @@ function Indicator({ label, value }: { label: string; value: React.ReactNode }) 
 }
 
 function UserMenu() {
+  const { data: session } = useSession();
+  const { navigate } = useNav();
+  const user = session?.user as any;
+  const name = user?.name ?? "Демо-режим";
+  const email = user?.email ?? "demo@astra-rec.io";
+  const initials = (name ?? "?").slice(0, 2).toUpperCase();
+  const role = user?.role ? { admin: "Администратор", developer: "Разработчик", reviewer: "Рецензент", viewer: "Наблюдатель" }[user.role] ?? user.role : "Демо";
+
   return (
     <div className="border-t border-primary/15 p-3">
       <DropdownMenu>
@@ -229,23 +238,22 @@ function UserMenu() {
           <button className="flex w-full items-center gap-2.5 rounded-lg border border-primary/10 bg-primary/5 px-2 py-2 hover:border-primary/30 hover:bg-primary/10 transition-colors">
             <Avatar className="h-8 w-8 border border-primary/30">
               <AvatarFallback className="bg-primary/15 text-primary text-xs font-mono">
-                ЕВ
+                {initials}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1 text-left leading-tight">
-              <div className="truncate text-sm font-medium">Елена Васкес</div>
-              <div className="font-mono text-[10px] text-primary/60">Lead Recruiter · L4</div>
+              <div className="truncate text-sm font-medium">{name}</div>
+              <div className="font-mono text-[10px] text-primary/60">{role}</div>
             </div>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side="top" className="w-52">
-          <DropdownMenuLabel className="font-mono text-xs">elena@astra-rec.io</DropdownMenuLabel>
+          <DropdownMenuLabel className="font-mono text-xs">{email}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Профиль оператора</DropdownMenuItem>
-          <DropdownMenuItem>API-ключи</DropdownMenuItem>
-          <DropdownMenuItem>Настройки сектора</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-rose-500">Отключиться</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("settings")}>Настройки</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })} className="text-rose-500">
+            Выйти
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
