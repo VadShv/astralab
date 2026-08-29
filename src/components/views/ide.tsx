@@ -397,6 +397,15 @@ export function IdeView() {
     },
   });
 
+  const deleteTcMut = useMutation({
+    mutationFn: (tcid: string) =>
+      fetch(`/api/prompts/${selectedPromptId}/test-cases/${tcid}`, { method: "DELETE" }).then((r) => r.json()),
+    onSuccess: () => {
+      toast.success("Тест-кейс удалён");
+      qc.invalidateQueries({ queryKey: ["test-cases", selectedPromptId] });
+    },
+  });
+
   const saveTestCase = () => {
     const name = prompt("Название тест-кейса:");
     if (!name) return;
@@ -542,13 +551,13 @@ export function IdeView() {
           <Button size="sm" variant="outline" onClick={openDiffToolbar} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2}>
             <FileDiff className="mr-1.5 h-4 w-4" /> Сравнить
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setCompareOpen(true)} disabled={!selectedPromptId || models.filter((m: any) => m.provider?.isActive).length < 2}>
+          <Button size="sm" variant="outline" onClick={() => setCompareOpen(true)} disabled={!selectedPromptId || models.filter((m: any) => m.provider?.isActive).length < 2} title="Сравнение моделей — нужно ≥2 активных модели">
             <GitCompare className="mr-1.5 h-4 w-4" /> Модели
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setBatchEvalOpen(true)} disabled={!selectedPromptId || testCases.length === 0}>
+          <Button size="sm" variant="outline" onClick={() => setBatchEvalOpen(true)} disabled={!selectedPromptId || testCases.length === 0} title="Батч-оценка — сначала сохраните тест-кейсы">
             <FlaskConical className="mr-1.5 h-4 w-4" /> Батч
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setExpLaunchOpen(true)} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2}>
+          <Button size="sm" variant="outline" onClick={() => setExpLaunchOpen(true)} disabled={!selectedPromptId || (versionsData?.versions?.length ?? 0) < 2} title="A/B эксперимент — нужно ≥2 версии">
             <FlaskConical className="mr-1.5 h-4 w-4" /> A/B
           </Button>
         </div>
@@ -674,18 +683,26 @@ export function IdeView() {
                   </Label>
                   <div className="flex flex-wrap gap-1.5">
                     {testCases.map((tc) => (
-                      <button
-                        key={tc.id}
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] transition-colors",
-                          activeTcId === tc.id
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border text-muted-foreground hover:bg-muted/50"
-                        )}
-                        onClick={() => loadTestCase(tc)}
-                      >
-                        {tc.name}
-                      </button>
+                      <div key={tc.id} className="inline-flex items-center gap-0.5">
+                        <button
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-l-full border border-r-0 px-2.5 py-1 text-[11px] transition-colors",
+                            activeTcId === tc.id
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border text-muted-foreground hover:bg-muted/50"
+                          )}
+                          onClick={() => loadTestCase(tc)}
+                        >
+                          {tc.name}
+                        </button>
+                        <button
+                          className="inline-flex h-[26px] w-5 items-center justify-center rounded-r-full border border-l-0 border-border text-muted-foreground hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-500"
+                          onClick={() => deleteTcMut.mutate(tc.id)}
+                          title="Удалить тест-кейс"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </div>

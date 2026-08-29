@@ -84,6 +84,12 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
   });
   const models: { id: string; displayName: string; provider: { name: string } }[] = modelsData?.models ?? [];
 
+  const { data: tagsData } = useQuery({
+    queryKey: ["tags", promptId],
+    queryFn: () => fetch(`/api/prompts/${promptId}/tags`).then((r) => r.json()),
+  });
+  const tags: { id: string; name: string; versionId: string }[] = tagsData?.tags ?? [];
+
   const [readOnly, setReadOnly] = React.useState(!!versionId);
   const [versionIdLocal, setVersionIdLocal] = React.useState<string | null>(versionId ?? null);
   const [content, setContent] = React.useState<PromptContent>({ system: "", user: "" });
@@ -93,6 +99,7 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
   const [branch, setBranch] = React.useState("main");
   const [commitMessage, setCommitMessage] = React.useState("");
   const [semverKind, setSemverKind] = React.useState<"patch" | "minor" | "major">("patch");
+  const [tagName, setTagName] = React.useState("");
 
   // initialize from version or defaults
   React.useEffect(() => {
@@ -144,6 +151,21 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
       qc.invalidateQueries({ queryKey: ["overview"] });
     },
     onError: (e: any) => toast.error(e?.message ?? "Не удалось сменить статус"),
+  });
+
+  const tagMut = useMutation({
+    mutationFn: (name: string) =>
+      fetch(`/api/prompts/${promptId}/tags`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, versionId }),
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      toast.success("Тег установлен");
+      setTagName("");
+      qc.invalidateQueries({ queryKey: ["tags", promptId] });
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Не удалось установить тег"),
   });
 
   const fork = () => {
@@ -254,6 +276,23 @@ function EditorInner({ promptId, versionId }: { promptId: string; versionId: str
                 </Select>
               </div>
             </div>
+            {version && (
+              <div className="mt-3 space-y-1.5 border-t pt-3">
+                <Label className="text-xs">Теги версии</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span key={t.id} className={cn("rounded-full border px-2 py-0.5 text-[10px]", t.versionId === versionId ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground")}>
+                      {t.name}
+                    </span>
+                  ))}
+                  {tags.length === 0 && <span className="text-[11px] text-muted-foreground">нет тегов</span>}
+                </div>
+                <div className="flex gap-2">
+                  <Input className="h-8 text-xs" placeholder="v1.0-rc" value={tagName} onChange={(e) => setTagName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tagName && tagMut.mutate(tagName)} />
+                  <Button size="sm" variant="outline" className="h-8" disabled={!tagName || !versionId} onClick={() => tagName && tagMut.mutate(tagName)}>Тег</Button>
+                </div>
+              </div>
+            )}
           </Card>
 
           {/* system */}

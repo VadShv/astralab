@@ -28,6 +28,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav-store";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,7 @@ const SECTIONS = [
 ];
 
 export function InstructionsView() {
+  const { navigate } = useNav();
   const [active, setActive] = React.useState("vvedenie");
   const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -90,6 +92,13 @@ export function InstructionsView() {
               Подробнейшее руководство по всему функционалу космической лаборатории HR-промптов.
               Описаны каждая вкладка, каждая кнопка и каждая функция сервиса.
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => navigate("library")}><Library className="mr-1.5 h-4 w-4" /> Библиотека</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate("ide")}><Code2 className="mr-1.5 h-4 w-4" /> IDE</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate("experiments")}><FlaskConical className="mr-1.5 h-4 w-4" /> A/B</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate("deployment")}><Rocket className="mr-1.5 h-4 w-4" /> Развёртывание</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate("audit")}><ScrollText className="mr-1.5 h-4 w-4" /> Аудит</Button>
+            </div>
           </div>
         </div>
       </div>

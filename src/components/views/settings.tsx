@@ -159,6 +159,8 @@ export function SettingsView() {
         </p>
       </div>
 
+      <TeamPanel />
+
       {/* Providers */}
       <Panel
         title="Провайдеры моделей"
@@ -549,5 +551,38 @@ function ProviderDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function TeamPanel() {
+  const { data } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetch("/api/users").then((r) => r.json()),
+  });
+  const users: { id: string; name: string; email: string; avatarColor: string; role: string }[] = data?.users ?? [];
+  return (
+    <Panel
+      title="Команда"
+      description="Операторы лаборатории — кто совершает действия в системе."
+    >
+      {users.length === 0 ? (
+        <div className="py-6 text-center text-sm text-muted-foreground">Пользователи не найдены.</div>
+      ) : (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {users.map((u) => (
+            <div key={u.id} className="flex items-center gap-2.5 rounded-lg border border-primary/10 bg-primary/5 p-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ background: u.avatarColor ?? "#71717a" }}>
+                {u.name?.slice(0, 2) ?? "?"}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium">{u.name}</div>
+                <div className="truncate font-mono text-[10px] text-muted-foreground">{u.email}</div>
+              </div>
+              <span className="ml-auto shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">{u.role}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Panel>
   );
 }
